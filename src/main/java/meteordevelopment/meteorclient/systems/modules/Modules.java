@@ -473,6 +473,7 @@ public class Modules extends System<Modules> {
         add(new EntityControl());
         add(new FastClimb());
         add(new Flight());
+        add(new Grim());
         add(new GUIMove());
         add(new HighJump());
         add(new Jesus());
