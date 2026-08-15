@@ -5,135 +5,142 @@
 
 package meteordevelopment.meteorclient.systems.modules.world;
 
-import meteordevelopment.meteorclient.events.entity.EntityAddedEvent;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import meteordevelopment.meteorclient.events.entity.EntityRemovedEvent;
-import meteordevelopment.meteorclient.settings.IntSetting;
-import meteordevelopment.meteorclient.settings.Setting;
-import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.projectile.EyeOfEnder;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class EnderEyeLogger extends Module {
-    private static final int MAX_STRONGHOLD_COORDINATE = 40_000;
+    private static final int MAX_STRONGHOLD_COORD = 40_000;
+    private static final IntList STRONGHOLD_DISTANCE_RANGES = new IntArrayList();
 
-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+    static {
+        int distance = 32;
+        for (int ring = 0; ring < 8; ring++) {
+            STRONGHOLD_DISTANCE_RANGES.add((int) (distance * (2.75 + 6 * ring)) * 16 - 128);
+            STRONGHOLD_DISTANCE_RANGES.add((int) (distance * (5.25 + 6 * ring)) * 16 + 128);
+        }
+    }
 
-    private final Setting<Integer> maxResults = sgGeneral.add(new IntSetting.Builder()
-        .name("max-results")
-        .description("Maximum number of possible stronghold chunks to show.")
-        .defaultValue(8)
-        .range(1, 32)
-        .sliderRange(1, 16)
-        .build()
-    );
-
-    private final Map<Integer, Vec3> startPositions = new HashMap<>();
+    private final Int2ObjectMap<Vec3> tracked = new Int2ObjectOpenHashMap<>();
 
     public EnderEyeLogger() {
-        super(Categories.World, "ender-eye-logger", "Estimates stronghold chunks from thrown Eyes of Ender.");
+        super(Categories.World, "ender-eye-logger", "Calculates possible stronghold positions from an Eye of Ender.");
     }
 
     @Override
     public void onActivate() {
-        startPositions.clear();
+        tracked.clear();
     }
 
     @Override
     public void onDeactivate() {
-        startPositions.clear();
+        tracked.clear();
     }
 
     @EventHandler
-    private void onEntityAdded(EntityAddedEvent event) {
-        if (event.entity instanceof EyeOfEnder) {
-            startPositions.put(event.entity.getId(), event.entity.position());
+    private void onPacketReceive(PacketEvent.Receive event) {
+        if (event.packet instanceof ClientboundAddEntityPacket packet && packet.getType() == EntityTypes.EYE_OF_ENDER) {
+            tracked.put(packet.getId(), new Vec3(packet.getX(), packet.getY(), packet.getZ()));
         }
     }
 
     @EventHandler
     private void onEntityRemoved(EntityRemovedEvent event) {
-        if (!(event.entity instanceof EyeOfEnder)) return;
+        if (!(event.entity instanceof EyeOfEnder eye)) return;
 
-        Vec3 start = startPositions.remove(event.entity.getId());
+        Vec3 start = tracked.remove(eye.getId());
         if (start == null) return;
 
-        Vec3 end = event.entity.position();
-        Vec3 path = end.subtract(start);
-        double horizontalDistance = Math.hypot(path.x(), path.z());
-        if (horizontalDistance < 0.01) return;
+        Vec3 velocity = eye.position().subtract(start).normalize();
+        int startX = (int) start.x();
+        info("Start calculating Eye of Ender...");
 
-        double heading = Math.toDegrees(Math.atan2(-path.x(), path.z()));
-        if (heading < 0) heading += 360;
-
-        List<StrongholdCandidate> candidates = findCandidates(start, path);
-        if (candidates.isEmpty()) {
-            warning("No stronghold candidates found. Throw another eye from a different position.");
+        if (velocity.x() == 0) {
+            info("Pointing at Z%s.", velocity.z() > 0 ? "+" : "-");
+            return;
+        }
+        if (velocity.z() == 0) {
+            info("Pointing at X%s.", velocity.x() > 0 ? "+" : "-");
             return;
         }
 
-        info("Eye heading %.1f degrees. Possible stronghold chunks:", heading);
-        for (int i = 0; i < Math.min(maxResults.get(), candidates.size()); i++) {
-            StrongholdCandidate candidate = candidates.get(i);
-            info("Ring %d: approximately %d, %d.", candidate.ring(), candidate.x(), candidate.z());
-        }
+        int deltaX = velocity.x() > 0 ? 1 : -1;
+        double slope = velocity.z() / velocity.x();
+        double intercept = start.z() - slope * start.x();
+
+        CompletableFuture.supplyAsync(() -> calculateCandidates(startX, deltaX, slope, intercept))
+            .thenAcceptAsync(candidates -> showCandidates(candidates, slope, intercept), mc);
     }
 
-    private static List<StrongholdCandidate> findCandidates(Vec3 start, Vec3 path) {
-        boolean useX = Math.abs(path.x()) >= Math.abs(path.z());
-        double primaryStart = useX ? start.x() : start.z();
-        double primaryDirection = useX ? path.x() : path.z();
-        double secondaryStart = useX ? start.z() : start.x();
-        double secondaryDirection = useX ? path.z() : path.x();
-        if (Math.abs(primaryDirection) < 1.0E-8) return List.of();
+    private static IntList calculateCandidates(int startX, int deltaX, double slope, double intercept) {
+        IntList testPoints = new IntArrayList();
+        int maxThresholdZ = (int) ((long) (MAX_STRONGHOLD_COORD - intercept - slope * startX) / (deltaX * slope));
+        int minThresholdZ = (int) ((long) (-MAX_STRONGHOLD_COORD - intercept - slope * startX) / (deltaX * slope));
+        int maxThresholdX = (MAX_STRONGHOLD_COORD - startX) / deltaX;
+        int minThresholdX = (-MAX_STRONGHOLD_COORD - startX) / deltaX;
+        int minThreshold = Math.max(0, Math.min(Math.min(maxThresholdZ, minThresholdZ), Math.min(maxThresholdX, minThresholdX)));
+        int maxThreshold = Math.max(0, Math.min(Math.max(maxThresholdZ, minThresholdZ), Math.max(maxThresholdX, minThresholdX)));
 
-        int step = primaryDirection > 0 ? 16 : -16;
-        int primary = primaryDirection > 0
-            ? (int) Math.ceil(primaryStart / 16.0) * 16
-            : (int) Math.floor(primaryStart / 16.0) * 16;
-        if (Math.abs(primary - primaryStart) < 1.0E-8) primary += step;
-
-        List<StrongholdCandidate> candidates = new ArrayList<>();
-        while (Math.abs(primary) <= MAX_STRONGHOLD_COORDINATE) {
-            double time = (primary - primaryStart) / primaryDirection;
-            if (time <= 0) {
-                primary += step;
-                continue;
-            }
-
-            double secondary = secondaryStart + secondaryDirection * time;
-            int secondaryChunk = (int) Math.round(secondary / 16.0) * 16;
-            if (Math.abs(secondary - secondaryChunk) <= 0.1) {
-                int x = useX ? primary : secondaryChunk;
-                int z = useX ? secondaryChunk : primary;
-                int ring = getStrongholdRing(x, z);
-                if (ring > 0) candidates.add(new StrongholdCandidate(x, z, ring));
-            }
-
-            primary += step;
+        for (int step = minThreshold; step < maxThreshold; step++) {
+            int x = startX + deltaX * step;
+            if (x % 16 == 0) testPoints.add(x);
         }
 
-        candidates.sort(Comparator.comparingDouble(candidate -> Math.hypot(candidate.x(), candidate.z())));
+        IntList candidates = new IntArrayList();
+        for (int x : testPoints) {
+            double z = slope * x + intercept;
+            long roundedZ = Math.round(z);
+            if (roundedZ % 16 == 0 && Math.abs(roundedZ - z) < 1E-1) candidates.add(x);
+        }
         return candidates;
     }
 
-    private static int getStrongholdRing(int x, int z) {
-        double distance = Math.hypot(x, z);
-        for (int ring = 0; ring < 8; ring++) {
-            int min = (int) (32 * (2.75 + 6 * ring)) * 16 - 128;
-            int max = (int) (32 * (5.25 + 6 * ring)) * 16 + 128;
-            if (distance >= min && distance <= max) return ring + 1;
+    private void showCandidates(IntList candidates, double slope, double intercept) {
+        if (candidates.isEmpty()) {
+            warning("Calculation failure.");
+            return;
         }
-        return -1;
-    }
 
-    private record StrongholdCandidate(int x, int z, int ring) {}
+        info("Potential positions:");
+        for (int x : candidates) {
+            int z = (int) Math.round(slope * x + intercept);
+            info(ChatUtils.formatCoords(new Vec3(x, 0, z)));
+        }
+
+        int foundRingIndex = -1;
+        outer:
+        for (int x : candidates) {
+            int z = (int) Math.round(slope * x + intercept);
+            int distance = (int) Math.sqrt((long) x * x + (long) z * z);
+            for (int index = 0; index < STRONGHOLD_DISTANCE_RANGES.size() - 1; index += 2) {
+                int min = STRONGHOLD_DISTANCE_RANGES.getInt(index);
+                int max = STRONGHOLD_DISTANCE_RANGES.getInt(index + 1);
+                if (distance < min || distance > max) continue;
+
+                if (foundRingIndex == -1 || foundRingIndex == index) {
+                    foundRingIndex = index;
+                    Component message = Component.literal("Most probably at: ")
+                        .append(ChatUtils.formatCoords(new Vec3(x, 0, z)))
+                        .append(Component.literal(", in ring " + (foundRingIndex / 2 + 1) + "."));
+                    info(message);
+                } else {
+                    break outer;
+                }
+            }
+        }
+    }
 }
