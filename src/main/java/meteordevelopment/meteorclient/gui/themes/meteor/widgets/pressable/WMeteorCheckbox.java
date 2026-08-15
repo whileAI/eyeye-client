@@ -30,7 +30,7 @@ public class WMeteorCheckbox extends WCheckbox implements MeteorWidget {
 
         if (animProgress > 0) {
             double cs = (width - theme.scale(2)) / 1.75 * animProgress;
-            renderer.quad(x + (width - cs) / 2, y + (height - cs) / 2, cs, cs, theme.checkboxColor.get());
+            renderer.quad(x + (width - cs) / 2, y + (height - cs) / 2, cs, cs, MeteorGuiTheme.ACTIVE_COLOR);
         }
     }
 }

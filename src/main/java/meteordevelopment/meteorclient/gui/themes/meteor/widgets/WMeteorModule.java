@@ -27,7 +27,6 @@ public class WMeteorModule extends WPressable implements MeteorWidget {
     private double animationProgress1;
 
     private double animationProgress2;
-    private final Color activeLineColor = new Color(137, 180, 250);
 
     public WMeteorModule(Module module, String title) {
         this.module = module;
@@ -93,7 +92,7 @@ public class WMeteorModule extends WPressable implements MeteorWidget {
             double lineX = textX + (titleWidth - lineWidth) / 2;
 
             roundedQuad(renderer, x, y + height * (1 - animationProgress2), theme.scale(2), height * animationProgress2, theme.scale(1), accentColor);
-            roundedQuad(renderer, lineX, y + height - lineHeight, lineWidth, lineHeight, theme.scale(0.5), activeLineColor);
+            roundedQuad(renderer, lineX, y + height - lineHeight, lineWidth, lineHeight, theme.scale(0.5), MeteorGuiTheme.ACTIVE_COLOR);
         }
 
         renderer.text(title, textX, y + pad, theme.textColor.get(), false);

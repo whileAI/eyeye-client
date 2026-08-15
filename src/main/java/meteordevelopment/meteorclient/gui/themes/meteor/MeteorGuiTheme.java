@@ -35,6 +35,8 @@ import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class MeteorGuiTheme extends GuiTheme {
+    public static final Color ACTIVE_COLOR = new Color(137, 180, 250);
+
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgColors = settings.createGroup("Colors");
     private final SettingGroup sgTextColors = settings.createGroup("Text");
