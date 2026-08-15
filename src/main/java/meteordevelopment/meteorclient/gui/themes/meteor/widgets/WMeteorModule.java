@@ -27,7 +27,7 @@ public class WMeteorModule extends WPressable implements MeteorWidget {
     private double animationProgress1;
 
     private double animationProgress2;
-    private final Color activeLineColor = new Color();
+    private final Color activeLineColor = new Color(180, 190, 254);
 
     public WMeteorModule(Module module, String title) {
         this.module = module;
@@ -68,6 +68,14 @@ public class WMeteorModule extends WPressable implements MeteorWidget {
     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
         MeteorGuiTheme theme = theme();
         double pad = pad();
+        double textX = this.x + pad;
+        double textAreaWidth = width - pad * 2;
+
+        if (theme.moduleAlignment.get() == AlignmentX.Center) {
+            textX += textAreaWidth / 2 - titleWidth / 2;
+        } else if (theme.moduleAlignment.get() == AlignmentX.Right) {
+            textX += textAreaWidth - titleWidth;
+        }
 
         animationProgress1 += delta * 4 * ((module.isActive() || mouseOver) ? 1 : -1);
         animationProgress1 = Mth.clamp(animationProgress1, 0, 1);
@@ -80,21 +88,14 @@ public class WMeteorModule extends WPressable implements MeteorWidget {
         }
         if (animationProgress2 > 0) {
             Color accentColor = theme.accentColor.get();
-            activeLineColor.set(Math.min(255, accentColor.r + 35), Math.min(255, accentColor.g + 35), Math.min(255, accentColor.b + 35), accentColor.a);
+            double lineHeight = theme.scale(4);
+            double lineWidth = titleWidth * 0.65 * animationProgress2;
+            double lineX = textX + (titleWidth - lineWidth) / 2;
 
             roundedQuad(renderer, x, y + height * (1 - animationProgress2), theme.scale(2), height * animationProgress2, theme.scale(1), accentColor);
-            roundedQuad(renderer, x, y + height - theme.scale(1), width * animationProgress2, theme.scale(1), theme.scale(0.5), activeLineColor);
+            roundedQuad(renderer, lineX, y + height - lineHeight, lineWidth, lineHeight, lineHeight / 2, activeLineColor);
         }
 
-        double x = this.x + pad;
-        double w = width - pad * 2;
-
-        if (theme.moduleAlignment.get() == AlignmentX.Center) {
-            x += w / 2 - titleWidth / 2;
-        } else if (theme.moduleAlignment.get() == AlignmentX.Right) {
-            x += w - titleWidth;
-        }
-
-        renderer.text(title, x, y + pad, theme.textColor.get(), false);
+        renderer.text(title, textX, y + pad, theme.textColor.get(), false);
     }
 }
