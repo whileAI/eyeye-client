@@ -11,6 +11,7 @@ import meteordevelopment.meteorclient.gui.themes.meteor.MeteorWidget;
 import meteordevelopment.meteorclient.gui.utils.AlignmentX;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WPressable;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.utils.render.color.Color;
 import net.minecraft.util.Mth;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
@@ -26,6 +27,7 @@ public class WMeteorModule extends WPressable implements MeteorWidget {
     private double animationProgress1;
 
     private double animationProgress2;
+    private final Color activeLineColor = new Color();
 
     public WMeteorModule(Module module, String title) {
         this.module = module;
@@ -77,7 +79,11 @@ public class WMeteorModule extends WPressable implements MeteorWidget {
             roundedQuad(renderer, x, y, width * animationProgress1, height, theme.scale(2), theme.moduleBackground.get());
         }
         if (animationProgress2 > 0) {
-            roundedQuad(renderer, x, y + height * (1 - animationProgress2), theme.scale(2), height * animationProgress2, theme.scale(1), theme.accentColor.get());
+            Color accentColor = theme.accentColor.get();
+            activeLineColor.set(Math.min(255, accentColor.r + 35), Math.min(255, accentColor.g + 35), Math.min(255, accentColor.b + 35), accentColor.a);
+
+            roundedQuad(renderer, x, y + height * (1 - animationProgress2), theme.scale(2), height * animationProgress2, theme.scale(1), accentColor);
+            roundedQuad(renderer, x, y + height - theme.scale(1), width * animationProgress2, theme.scale(1), theme.scale(0.5), activeLineColor);
         }
 
         double x = this.x + pad;
