@@ -578,6 +578,7 @@ public class Modules extends System<Modules> {
         add(new PacketCanceller());
         add(new PacketLogger());
         add(new ServerSpoof());
+        add(new SkinBlink());
         add(new SoundBlocker());
         add(new Spam());
         add(new Swarm());
