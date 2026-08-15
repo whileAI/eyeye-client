@@ -7,6 +7,7 @@ package meteordevelopment.meteorclient.systems.modules.movement;
 
 import meteordevelopment.meteorclient.events.entity.player.PlayerMoveEvent;
 import meteordevelopment.meteorclient.mixininterface.IVec3;
+import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.DoubleSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
@@ -28,8 +29,22 @@ public class Strafe extends Module {
         .build()
     );
 
+    private final Setting<Boolean> airStrafe = sgGeneral.add(new BoolSetting.Builder()
+        .name("air-strafe")
+        .description("Applies strafing while airborne.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> groundStrafe = sgGeneral.add(new BoolSetting.Builder()
+        .name("ground-strafe")
+        .description("Applies strafing while on the ground.")
+        .defaultValue(true)
+        .build()
+    );
+
     public Strafe() {
-        super(Categories.Movement, "strafe", "Improves directional control while moving through the air.");
+        super(Categories.Movement, "strafe", "Improves directional control while moving.");
     }
 
     @EventHandler
@@ -39,6 +54,7 @@ public class Strafe extends Module {
             || mc.player.isInWater()
             || mc.player.isInLava()
             || !PlayerUtils.isMoving()) return;
+        if (mc.player.onGround() ? !groundStrafe.get() : !airStrafe.get()) return;
 
         double horizontalSpeed = Math.max(Math.hypot(event.movement.x(), event.movement.z()), speed.get());
         Vector2d movement = meteordevelopment.meteorclient.systems.modules.movement.speed.modes.Strafe.transformStrafe(horizontalSpeed);
