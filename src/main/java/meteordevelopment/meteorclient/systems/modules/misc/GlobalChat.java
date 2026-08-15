@@ -20,6 +20,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 public class GlobalChat extends Module {
@@ -78,10 +79,8 @@ public class GlobalChat extends Module {
 
         WebSocket current = socket;
         if (current == null || !server.equals(connectedServer)) {
-            if (!server.equals(connectedServer)) {
-                disconnect();
-                connect();
-            }
+            disconnect();
+            connect();
             warning("EyEye Chat is connecting. Try again in a moment.");
             return false;
         }
@@ -131,7 +130,10 @@ public class GlobalChat extends Module {
 
     private String getServer() {
         if (mc.isLocalServer() || mc.getCurrentServer() == null) return "";
-        return sanitize(mc.getCurrentServer().ip);
+        String server = sanitize(mc.getCurrentServer().ip).toLowerCase(Locale.ROOT);
+        if (server.endsWith(".")) server = server.substring(0, server.length() - 1);
+        if (server.endsWith(":25565")) server = server.substring(0, server.length() - 6);
+        return server;
     }
 
     private static String sanitize(String value) {
@@ -173,14 +175,20 @@ public class GlobalChat extends Module {
 
         @Override
         public void onError(WebSocket webSocket, Throwable error) {
-            socket = null;
+            forget(webSocket);
             mc.execute(() -> warning("EyEye Chat connection lost: %s", error.getMessage()));
         }
 
         @Override
         public CompletableFuture<?> onClose(WebSocket webSocket, int statusCode, String reason) {
-            if (socket == webSocket) socket = null;
+            forget(webSocket);
             return CompletableFuture.completedFuture(null);
+        }
+
+        private void forget(WebSocket webSocket) {
+            if (socket != webSocket) return;
+            socket = null;
+            connectedServer = "";
         }
     }
 }
