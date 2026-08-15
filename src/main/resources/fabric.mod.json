@@ -5,9 +5,7 @@
   "version": "${version}",
   "description": "Based utility mod.",
   "authors": [
-    "MineGame159",
-    "squidoodly",
-    "seasnail"
+    "whileai"
   ],
   "license": "GPL-3.0",
   "icon": "assets/eyeye-client/icon.png",
@@ -31,7 +29,7 @@
   "accessWidener": "eyeye-client.classtweaker",
   "custom": {
     "eyeye-client:build_number": "${build_number}",
-    "eyeye-client:color": "145,61,226",
+    "eyeye-client:color": "30,30,46",
     "eyeye-client:commit": "${commit}",
     "modmenu": {
       "links": {

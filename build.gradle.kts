@@ -10,7 +10,7 @@ base {
     archivesName = archivesBaseName
     group = mavenGroup
 
-    val suffix = providers.gradleProperty("build_number").getOrElse("local")
+    val suffix = providers.gradleProperty("build_number").getOrElse(providers.gradleProperty("release_version").getOrElse("local"))
     version = "${libs.versions.minecraft.get()}-$suffix"
 }
 

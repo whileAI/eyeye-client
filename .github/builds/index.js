@@ -26,7 +26,7 @@ function sendDiscordWebhook() {
             for (let i in res.commits) {
                 let commit = res.commits[i];
 
-                changes += "\n- [`" + commit.sha.substring(0, 7) + "`](https://github.com/MeteorDevelopment/meteor-client/commit/" + commit.sha + ") *" + commit.commit.message + "*";
+                changes += "\n- [`" + commit.sha.substring(0, 7) + "`](https://github.com/whileAI/eyeye-client/commit/" + commit.sha + ") *" + commit.commit.message + "*";
                 hasChanges = true;
             }
             if (hasChanges) description += changes;

@@ -42,8 +42,8 @@ public abstract class SplashManagerMixin {
             "EyEye on Crack!",
             "Star EyEye Client on GitHub!",
             "Based utility mod.",
-            "§6MineGame159 §fbased god",
-            "§4meteorclient.com",
+            "§6whileai §fbased god",
+            "§4EyEye Client",
             "§4EyEye on Crack!",
             "§6EyEye on Crack!"
         );

@@ -16,6 +16,6 @@ public class WMeteorTooltip extends WTooltip implements MeteorWidget {
 
     @Override
     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
-        renderer.quad(this, theme().backgroundColor.get());
+        roundedQuad(renderer, x, y, width, height, theme().scale(2), theme().backgroundColor.get());
     }
 }

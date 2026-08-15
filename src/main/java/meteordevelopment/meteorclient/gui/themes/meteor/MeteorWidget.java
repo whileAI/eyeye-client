@@ -15,16 +15,28 @@ public interface MeteorWidget extends BaseWidget {
         return (MeteorGuiTheme) getTheme();
     }
 
+    default void roundedQuad(GuiRenderer renderer, double x, double y, double width, double height, double radius, Color color) {
+        double r = Math.min(radius, Math.min(width, height) / 2);
+        if (r <= 0) {
+            renderer.quad(x, y, width, height, color);
+            return;
+        }
+
+        renderer.quad(x + r, y, width - r * 2, height, color);
+        renderer.quad(x, y + r, width, height - r * 2, color);
+        renderer.triangle(x + r, y, x, y + r, x + r, y + r, color);
+        renderer.triangle(x + width - r, y, x + width - r, y + r, x + width, y + r, color);
+        renderer.triangle(x, y + height - r, x + r, y + height - r, x + r, y + height, color);
+        renderer.triangle(x + width - r, y + height - r, x + width, y + height - r, x + width - r, y + height, color);
+    }
+
     default void renderBackground(GuiRenderer renderer, WWidget widget, Color outlineColor, Color backgroundColor) {
         MeteorGuiTheme theme = theme();
-        double s = theme.scale(2);
+        double border = theme.scale(1);
+        double radius = theme.scale(2);
 
-        renderer.quad(widget.x + s, widget.y + s, widget.width - s * 2, widget.height - s * 2, backgroundColor);
-
-        renderer.quad(widget.x, widget.y, widget.width, s, outlineColor);
-        renderer.quad(widget.x, widget.y + widget.height - s, widget.width, s, outlineColor);
-        renderer.quad(widget.x, widget.y + s, s, widget.height - s * 2, outlineColor);
-        renderer.quad(widget.x + widget.width - s, widget.y + s, s, widget.height - s * 2, outlineColor);
+        roundedQuad(renderer, widget.x, widget.y, widget.width, widget.height, radius, outlineColor);
+        roundedQuad(renderer, widget.x + border, widget.y + border, widget.width - border * 2, widget.height - border * 2, radius - border, backgroundColor);
     }
 
     default void renderBackground(GuiRenderer renderer, WWidget widget, boolean pressed, boolean mouseOver) {

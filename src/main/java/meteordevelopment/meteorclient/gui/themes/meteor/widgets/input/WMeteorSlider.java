@@ -32,8 +32,8 @@ public class WMeteorSlider extends WSlider implements MeteorWidget {
         double x = this.x + handleSize / 2;
         double y = this.y + height / 2 - s / 2;
 
-        renderer.quad(x, y, valueWidth, s, theme.sliderLeft.get());
-        renderer.quad(x + valueWidth, y, width - valueWidth - handleSize, s, theme.sliderRight.get());
+        roundedQuad(renderer, x, y, valueWidth, s, s / 2, theme.sliderLeft.get());
+        roundedQuad(renderer, x + valueWidth, y, width - valueWidth - handleSize, s, s / 2, theme.sliderRight.get());
     }
 
     private void renderHandle(GuiRenderer renderer, double valueWidth) {

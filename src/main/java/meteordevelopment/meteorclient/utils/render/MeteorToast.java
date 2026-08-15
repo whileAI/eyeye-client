@@ -25,7 +25,7 @@ import org.jspecify.annotations.Nullable;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class MeteorToast implements Toast {
-    private static final int TITLE_COLOR = Color.fromRGBA(145, 61, 226, 255);
+    private static final int TITLE_COLOR = Color.fromRGBA(30, 30, 46, 255);
     private static final int TEXT_COLOR = Color.fromRGBA(220, 220, 220, 255);
     private static final Identifier TEXTURE = Identifier.parse("toast/advancement");
     private static final long DEFAULT_DURATION = 6000;
