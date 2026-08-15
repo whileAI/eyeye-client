@@ -81,7 +81,7 @@ public class DiscordPresence extends Module {
     private final Setting<List<String>> line2Strings = sgLine2.add(new StringListSetting.Builder()
         .name("line-2-messages")
         .description("Messages used for the second line.")
-        .defaultValue("Meteor on Crack!", "{round(server.tps, 1)} TPS", "Playing on {server.difficulty} difficulty.", "{server.player_count} Players online")
+        .defaultValue("EyEye on Crack!", "{round(server.tps, 1)} TPS", "Playing on {server.difficulty} difficulty.", "{server.player_count} Players online")
         .onChanged(_ -> recompileLine2())
         .renderer(StarscriptTextBoxRenderer.class)
         .build()
@@ -122,7 +122,7 @@ public class DiscordPresence extends Module {
     }
 
     public DiscordPresence() {
-        super(Categories.Misc, "discord-presence", "Displays Meteor as your presence on Discord.");
+        super(Categories.Misc, "discord-presence", "Displays EyEye as your presence on Discord.");
 
         runInMainMenu = true;
     }
@@ -250,7 +250,7 @@ public class DiscordPresence extends Module {
                 else if (mc.gui.screen() instanceof ManageServerScreen) rpc.setState("Adding server");
                 else if (mc.gui.screen() instanceof ConnectScreen || mc.gui.screen() instanceof DirectJoinServerScreen)
                     rpc.setState("Connecting to server");
-                else if (mc.gui.screen() instanceof WidgetScreen) rpc.setState("Browsing Meteor's GUI");
+                else if (mc.gui.screen() instanceof WidgetScreen) rpc.setState("Browsing EyEye's GUI");
                 else if (mc.gui.screen() instanceof OptionsScreen || mc.gui.screen() instanceof SkinCustomizationScreen || mc.gui.screen() instanceof SoundOptionsScreen || mc.gui.screen() instanceof VideoSettingsScreen || mc.gui.screen() instanceof ControlsScreen || mc.gui.screen() instanceof LanguageSelectScreen || mc.gui.screen() instanceof ChatOptionsScreen || mc.gui.screen() instanceof PackSelectionScreen || mc.gui.screen() instanceof AccessibilityOptionsScreen)
                     rpc.setState("Changing options");
                 else if (mc.gui.screen() instanceof WinScreen) rpc.setState("Reading credits");

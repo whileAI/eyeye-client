@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "name": "Meteor Client",
-  "id": "meteor-client",
+  "name": "EyEye Client",
+  "id": "eyeye-client",
   "version": "${version}",
   "description": "Based utility mod.",
   "authors": [
@@ -9,14 +9,8 @@
     "squidoodly",
     "seasnail"
   ],
-  "contact": {
-    "homepage": "https://meteorclient.com",
-    "issues": "https://github.com/MeteorDevelopment/meteor-client/issues",
-    "sources": "https://github.com/MeteorDevelopment/meteor-client",
-    "discord": "https://meteorclient.com/discord"
-  },
   "license": "GPL-3.0",
-  "icon": "assets/meteor-client/icon.png",
+  "icon": "assets/eyeye-client/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
@@ -27,18 +21,18 @@
     ]
   },
   "mixins": [
-    "meteor-client.mixins.json",
-    "meteor-client-baritone.mixins.json",
-    "meteor-client-indigo.mixins.json",
-    "meteor-client-sodium.mixins.json",
-    "meteor-client-lithium.mixins.json",
-    "meteor-client-viafabricplus.mixins.json"
+    "eyeye-client.mixins.json",
+    "eyeye-client-baritone.mixins.json",
+    "eyeye-client-indigo.mixins.json",
+    "eyeye-client-sodium.mixins.json",
+    "eyeye-client-lithium.mixins.json",
+    "eyeye-client-viafabricplus.mixins.json"
   ],
-  "accessWidener": "meteor-client.classtweaker",
+  "accessWidener": "eyeye-client.classtweaker",
   "custom": {
-    "meteor-client:build_number": "${build_number}",
-    "meteor-client:color": "145,61,226",
-    "meteor-client:commit": "${commit}",
+    "eyeye-client:build_number": "${build_number}",
+    "eyeye-client:color": "145,61,226",
+    "eyeye-client:commit": "${commit}",
     "modmenu": {
       "links": {
         "modmenu.discord": "https://meteorclient.com/discord"

@@ -131,7 +131,7 @@ listOf("api", "implementation", "include").forEach { configName ->
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/meteor-client.classtweaker")
+    accessWidenerPath = file("src/main/resources/eyeye-client.classtweaker")
 }
 
 fun toMinecraftCompat(version: String): String {
@@ -229,7 +229,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifactId = "meteor-client"
+            artifactId = "eyeye-client"
 
             version = "${libs.versions.minecraft.get()}-SNAPSHOT"
         }

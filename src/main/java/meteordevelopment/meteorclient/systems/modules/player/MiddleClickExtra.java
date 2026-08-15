@@ -51,7 +51,7 @@ public class MiddleClickExtra extends Module {
     private final Setting<String> friendMessage = sgGeneral.add(new StringSetting.Builder()
         .name("message-to-send")
         .description("Message to send when you add a player as a friend (use %player for the player's name)")
-        .defaultValue("/msg %player I just friended you on Meteor.")
+        .defaultValue("/msg %player I just friended you on EyEye.")
         .visible(() -> mode.get() == Mode.AddFriend)
         .build()
     );

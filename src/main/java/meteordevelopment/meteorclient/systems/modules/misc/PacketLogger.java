@@ -89,7 +89,7 @@ public class PacketLogger extends Module {
 
     private final Setting<Boolean> logToFile = sgOutput.add(new BoolSetting.Builder()
         .name("log-to-file")
-        .description("Save packet logs to a file in the meteor-client folder.")
+        .description("Save packet logs to a file in the eyeye-client folder.")
         .defaultValue(false)
         .build()
     );

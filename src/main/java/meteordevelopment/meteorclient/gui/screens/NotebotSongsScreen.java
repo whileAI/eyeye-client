@@ -69,7 +69,7 @@ public class NotebotSongsScreen extends WindowScreen {
                 }
             });
         } catch (IOException _) {
-            table.add(theme.label("Missing meteor-client/notebot folder.")).expandCellX();
+            table.add(theme.label("Missing eyeye-client/notebot folder.")).expandCellX();
             table.row();
         }
 

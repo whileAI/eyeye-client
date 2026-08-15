@@ -52,7 +52,7 @@ public abstract class Module implements ISerializable<Module>, Comparable<Module
 
     public Module(Category category, String name, String description, String... aliases) {
         if (name.contains(" "))
-            MeteorClient.LOG.warn("Module '{}' contains invalid characters in its name making it incompatible with Meteor Client commands.", name);
+            MeteorClient.LOG.warn("Module '{}' contains invalid characters in its name making it incompatible with EyEye Client commands.", name);
 
         this.mc = Minecraft.getInstance();
         this.category = category;

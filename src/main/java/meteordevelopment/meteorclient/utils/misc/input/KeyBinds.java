@@ -11,10 +11,10 @@ import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyBinds {
-    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(MeteorClient.identifier("meteor-client"));
+    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(MeteorClient.identifier("eyeye-client"));
 
-    public static KeyMapping OPEN_GUI = new KeyMapping("key.meteor-client.open-gui", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, CATEGORY);
-    public static KeyMapping OPEN_COMMANDS = new KeyMapping("key.meteor-client.open-commands", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_PERIOD, CATEGORY);
+    public static KeyMapping OPEN_GUI = new KeyMapping("key.eyeye-client.open-gui", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, CATEGORY);
+    public static KeyMapping OPEN_COMMANDS = new KeyMapping("key.eyeye-client.open-commands", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_PERIOD, CATEGORY);
 
     private KeyBinds() {
     }

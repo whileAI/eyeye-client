@@ -83,7 +83,7 @@ public abstract class PostProcessShader {
         .putFloat()
         .get();
 
-    private static final DynamicUniformStorage<UniformData> UNIFORM_STORAGE = new DynamicUniformStorage<>("Meteor - Post UBO", UNIFORM_SIZE, 16);
+    private static final DynamicUniformStorage<UniformData> UNIFORM_STORAGE = new DynamicUniformStorage<>("EyEye - Post UBO", UNIFORM_SIZE, 16);
 
     public static void flipFrame() {
         UNIFORM_STORAGE.endFrame();

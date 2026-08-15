@@ -29,7 +29,7 @@ import java.util.*;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class Hud extends System<Hud> implements Iterable<HudElement> {
-    public static final HudGroup GROUP = new HudGroup("Meteor");
+    public static final HudGroup GROUP = new HudGroup("EyEye");
 
     public boolean active;
     public Settings settings = new Settings();

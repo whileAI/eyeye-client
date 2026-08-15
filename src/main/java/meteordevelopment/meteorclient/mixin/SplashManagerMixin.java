@@ -39,13 +39,13 @@ public abstract class SplashManagerMixin {
     @Unique
     private static List<String> getMeteorSplashes() {
         return List.of(
-            "Meteor on Crack!",
-            "Star Meteor Client on GitHub!",
+            "EyEye on Crack!",
+            "Star EyEye Client on GitHub!",
             "Based utility mod.",
             "§6MineGame159 §fbased god",
             "§4meteorclient.com",
-            "§4Meteor on Crack!",
-            "§6Meteor on Crack!"
+            "§4EyEye on Crack!",
+            "§6EyEye on Crack!"
         );
     }
 

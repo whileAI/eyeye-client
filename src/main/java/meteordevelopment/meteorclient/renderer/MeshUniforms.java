@@ -22,7 +22,7 @@ public class MeshUniforms {
 
     private static final Data DATA = new Data();
 
-    private static final DynamicUniformStorage<Data> STORAGE = new DynamicUniformStorage<>("Meteor - Mesh UBO", SIZE, 16);
+    private static final DynamicUniformStorage<Data> STORAGE = new DynamicUniformStorage<>("EyEye - Mesh UBO", SIZE, 16);
 
     public static void flipFrame() {
         STORAGE.endFrame();
