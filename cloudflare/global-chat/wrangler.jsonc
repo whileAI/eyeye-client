@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "eyeye-global-chat",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-16",
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "GLOBAL_CHAT",
+        "class_name": "GlobalChatRoom"
+      }
+    ]
+  },
+  "exports": {
+    "GlobalChatRoom": {
+      "type": "durable-object",
+      "state": "created",
+      "storage": "sqlite"
+    }
+  }
+}

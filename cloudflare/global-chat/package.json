@@ -1,0 +1,15 @@
+{
+  "name": "eyeye-global-chat",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260815.1",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.123.0"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "check": "tsc --noEmit"
+  }
+}

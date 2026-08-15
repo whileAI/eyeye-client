@@ -574,6 +574,7 @@ public class Modules extends System<Modules> {
         add(new BookBot());
         add(new DiscordPresence());
         add(new InventoryTweaks());
+        add(new GlobalChat());
         add(new MessageAura());
         add(new Notebot());
         add(new Notifier());
