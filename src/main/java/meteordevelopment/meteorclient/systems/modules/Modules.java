@@ -482,6 +482,7 @@ public class Modules extends System<Modules> {
         add(new ReverseStep());
         add(new SafeWalk());
         add(new Scaffold());
+        add(new SetbackLogger());
         add(new Slippy());
         add(new Sneak());
         add(new Speed());
