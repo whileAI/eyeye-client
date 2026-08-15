@@ -547,6 +547,7 @@ public class Modules extends System<Modules> {
         add(new BuildHeight());
         add(new Collisions());
         add(new EChestFarmer());
+        add(new EnderEyeLogger());
         add(new EndermanLook());
         add(new Flamethrower());
         add(new HighwayBuilder());
