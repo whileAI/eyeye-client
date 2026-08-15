@@ -35,7 +35,6 @@ public class Strafe extends Module {
     @EventHandler
     private void onPlayerMove(PlayerMoveEvent event) {
         if (mc.player == null
-            || mc.player.onGround()
             || mc.player.isFallFlying()
             || mc.player.isInWater()
             || mc.player.isInLava()
