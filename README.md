@@ -1,6 +1,6 @@
 
 <p align="center">
-<img src="src/main/resources/assets/eyeye-client/icon.png" alt="eyeye-client-logo" width="15%"/>
+<img src="https://raw.githubusercontent.com/whileAI/eyeye-client/master/imgs/logo.png" alt="EyEye Client logo" width="15%"/>
 </p>
 
 <h1 align="center">EyEye</h1>
