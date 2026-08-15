@@ -14,14 +14,27 @@ export default {
       return new Response("Expected WebSocket upgrade.", { status: 426 });
     }
 
-    return env.GLOBAL_CHAT.getByName("global").fetch(request);
+    const server = normalize(new URL(request.url).searchParams.get("server") ?? "", 128);
+    if (!server) return new Response("Missing server identifier.", { status: 400 });
+
+    return env.GLOBAL_CHAT.getByName(server).fetch(request);
   }
 };
 
 export class GlobalChatRoom extends DurableObject<Env> {
+  private readonly sessions = new Set<WebSocket>();
+
+  constructor(ctx: DurableObjectState, env: Env) {
+    super(ctx, env);
+
+    this.ctx.getWebSockets().forEach(socket => this.sessions.add(socket));
+  }
+
   async fetch(_request: Request): Promise<Response> {
     const [client, server] = Object.values(new WebSocketPair()) as [WebSocket, WebSocket];
     this.ctx.acceptWebSocket(server);
+    server.serializeAttachment(true);
+    this.sessions.add(server);
 
     return new Response(null, { status: 101, webSocket: client });
   }
@@ -33,11 +46,17 @@ export class GlobalChatRoom extends DurableObject<Env> {
     if (!payload) return;
 
     const broadcast = `${payload.author}\t${payload.message}`;
-    for (const socket of this.ctx.getWebSockets()) socket.send(broadcast);
+    this.sessions.forEach(socket => {
+      try {
+        socket.send(broadcast);
+      } catch {
+        this.sessions.delete(socket);
+      }
+    });
   }
 
-  async webSocketClose(socket: WebSocket, code: number, reason: string): Promise<void> {
-    socket.close(code, reason);
+  async webSocketClose(socket: WebSocket): Promise<void> {
+    this.sessions.delete(socket);
   }
 }
 

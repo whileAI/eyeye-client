@@ -159,7 +159,7 @@ public class Config extends System<Config> {
     public final Setting<String> prefix = sgChat.add(new StringSetting.Builder()
         .name("prefix")
         .description("Prefix.")
-        .defaultValue(".")
+        .defaultValue(";")
         .build()
     );
 
@@ -218,6 +218,7 @@ public class Config extends System<Config> {
     @Override
     public Config fromTag(CompoundTag tag) {
         if (tag.contains("settings")) settings.fromTag(tag.getCompoundOrEmpty("settings"));
+        if (prefix.get().equals(".")) prefix.set(";");
         if (tag.contains("dontShowAgainPrompts")) dontShowAgainPrompts = listFromTag(tag, "dontShowAgainPrompts");
 
         return this;

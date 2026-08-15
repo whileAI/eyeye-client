@@ -39,6 +39,8 @@ public class Commands {
         add(new FakePlayerCommand());
         add(new FriendsCommand());
         add(new CommandsCommand());
+        add(new ChatCommand());
+        add(new ChatStatusCommand());
         add(new InventoryCommand());
         add(new NbtCommand());
         add(new NotebotCommand());

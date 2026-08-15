@@ -18,6 +18,9 @@
 ### Installation
 Place the built JAR in the Minecraft `mods` folder and start Fabric.
 
+### EyEye Chat
+Use `;chat-status true` to enable EyEye Chat and `;chat <message>` to send a message. Chat messages are isolated by the current multiplayer server, so users on different servers cannot see each other. Use `;chat-status false` to stop receiving messages.
+
 ## Contributions
 We will review and help with all reasonable pull requests as long as the guidelines below are met.
 

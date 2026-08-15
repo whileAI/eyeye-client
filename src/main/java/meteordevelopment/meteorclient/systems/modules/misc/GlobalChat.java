@@ -5,7 +5,7 @@
 
 package meteordevelopment.meteorclient.systems.modules.misc;
 
-import meteordevelopment.meteorclient.events.game.SendMessageEvent;
+import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.settings.StringSetting;
@@ -16,44 +16,32 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.chat.Component;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.util.concurrent.CompletableFuture;
 
 public class GlobalChat extends Module {
     private static final int MAX_MESSAGE_LENGTH = 256;
+    private static final String ENDPOINT = "wss://eyeye-global-chat.eyeye-local-chat.workers.dev/chat";
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
-    private final Setting<String> endpoint = sgGeneral.add(new StringSetting.Builder()
-        .name("endpoint")
-        .description("Cloudflare Worker WebSocket address.")
-        .placeholder("wss://your-worker.workers.dev/chat")
-        .defaultValue("")
-        .wide()
-        .build()
-    );
-
     private final Setting<String> nickname = sgGeneral.add(new StringSetting.Builder()
         .name("nickname")
-        .description("Name shown in Global Chat. Uses your Minecraft name when empty.")
+        .description("Name shown in EyEye Chat. Uses your Minecraft name when empty.")
         .defaultValue("")
-        .build()
-    );
-
-    private final Setting<String> prefix = sgGeneral.add(new StringSetting.Builder()
-        .name("prefix")
-        .description("Messages starting with this prefix are sent to Global Chat.")
-        .defaultValue("!")
         .build()
     );
 
     private final HttpClient client = HttpClient.newHttpClient();
     private final StringBuilder received = new StringBuilder();
     private volatile WebSocket socket;
+    private volatile String connectedServer = "";
 
     public GlobalChat() {
-        super(Categories.Misc, "global-chat", "Sends messages to other EyEye users through Cloudflare.");
+        super(Categories.Misc, "global-chat", "Shares messages with EyEye users on the same server.");
     }
 
     @Override
@@ -63,65 +51,87 @@ public class GlobalChat extends Module {
 
     @Override
     public void onDeactivate() {
-        WebSocket current = socket;
-        socket = null;
-        if (current != null) current.sendClose(WebSocket.NORMAL_CLOSURE, "Disabled");
+        disconnect();
     }
 
     @EventHandler
-    private void onMessageSend(SendMessageEvent event) {
-        String marker = prefix.get();
-        if (marker.isEmpty() || !event.message.startsWith(marker)) return;
+    private void onGameJoined(GameJoinedEvent event) {
+        if (!isActive()) return;
+        disconnect();
+        connect();
+    }
 
-        event.cancel();
-        String message = sanitize(event.message.substring(marker.length()));
-        if (message.isEmpty()) return;
-
-        WebSocket current = socket;
-        if (current == null) {
-            warning("Global Chat is not connected.");
-            return;
+    public boolean send(String message) {
+        if (!isActive()) {
+            error("EyEye Chat is disabled. Run ;chat-status true first.");
+            return false;
         }
 
-        current.sendText(getNickname() + "\t" + message, true);
+        String server = getServer();
+        if (server.isEmpty()) {
+            error("EyEye Chat only works on multiplayer servers.");
+            return false;
+        }
+
+        String content = sanitize(message);
+        if (content.isEmpty()) return false;
+
+        WebSocket current = socket;
+        if (current == null || !server.equals(connectedServer)) {
+            if (!server.equals(connectedServer)) {
+                disconnect();
+                connect();
+            }
+            warning("EyEye Chat is connecting. Try again in a moment.");
+            return false;
+        }
+
+        current.sendText(getNickname() + "\t" + content, true);
+        return true;
     }
 
     private void connect() {
-        if (endpoint.get().isBlank()) {
-            warning("Set a Cloudflare Worker endpoint first.");
-            return;
-        }
+        String server = getServer();
+        if (server.isEmpty()) return;
 
         try {
-            URI address = URI.create(endpoint.get());
-            if (!"ws".equalsIgnoreCase(address.getScheme()) && !"wss".equalsIgnoreCase(address.getScheme())) {
-                warning("Endpoint must start with ws:// or wss://.");
-                return;
-            }
-
-            client.newWebSocketBuilder().buildAsync(address, new ChatListener()).whenComplete((connected, error) -> {
+            URI endpoint = URI.create(ENDPOINT + "?server=" + URLEncoder.encode(server, StandardCharsets.UTF_8));
+            client.newWebSocketBuilder().buildAsync(endpoint, new ChatListener()).whenComplete((connected, error) -> {
                 if (error != null) {
-                    mc.execute(() -> warning("Connection failed: %s", error.getMessage()));
+                    mc.execute(() -> warning("EyEye Chat connection failed: %s", error.getMessage()));
                     return;
                 }
 
-                if (!isActive()) {
+                if (!isActive() || !server.equals(getServer())) {
                     connected.sendClose(WebSocket.NORMAL_CLOSURE, "Disabled");
                     return;
                 }
 
                 socket = connected;
-                mc.execute(() -> info("Connected. Use %smessage to send Global Chat messages.", prefix.get()));
+                connectedServer = server;
+                mc.execute(() -> info("EyEye Chat enabled. Use ;chat <message>."));
             });
         } catch (IllegalArgumentException error) {
-            warning("Invalid Cloudflare Worker endpoint.");
+            error("EyEye Chat endpoint is invalid.");
         }
+    }
+
+    private void disconnect() {
+        WebSocket current = socket;
+        socket = null;
+        connectedServer = "";
+        if (current != null) current.sendClose(WebSocket.NORMAL_CLOSURE, "Disabled");
     }
 
     private String getNickname() {
         String value = sanitize(nickname.get());
         if (!value.isEmpty()) return value;
         return mc.player != null ? sanitize(mc.player.getName().getString()) : "EyEye User";
+    }
+
+    private String getServer() {
+        if (mc.isLocalServer() || mc.getCurrentServer() == null) return "";
+        return sanitize(mc.getCurrentServer().ip);
     }
 
     private static String sanitize(String value) {
@@ -137,7 +147,7 @@ public class GlobalChat extends Module {
         String message = sanitize(payload.substring(separator + 1));
         if (author.isEmpty() || message.isEmpty()) return;
 
-        ChatUtils.sendMsg(Component.literal("[Global] ").append(author).append(" » ").append(message));
+        ChatUtils.sendMsg(Component.literal("[EyEye Chat] <").append(author).append("> ").append(message));
     }
 
     private class ChatListener implements WebSocket.Listener {
@@ -164,7 +174,7 @@ public class GlobalChat extends Module {
         @Override
         public void onError(WebSocket webSocket, Throwable error) {
             socket = null;
-            mc.execute(() -> warning("Connection lost: %s", error.getMessage()));
+            mc.execute(() -> warning("EyEye Chat connection lost: %s", error.getMessage()));
         }
 
         @Override
