@@ -490,6 +490,7 @@ public class Modules extends System<Modules> {
         add(new Speed());
         add(new Spider());
         add(new Sprint());
+        add(new Strafe());
         add(new Step());
         add(new TridentBoost());
         add(new Velocity());
