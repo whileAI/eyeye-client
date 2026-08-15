@@ -13,6 +13,7 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.orbit.EventHandler;
 import org.joml.Vector2d;
@@ -50,6 +51,7 @@ public class Strafe extends Module {
     @EventHandler
     private void onPlayerMove(PlayerMoveEvent event) {
         if (mc.player == null
+            || Modules.get().isActive(Flight.class)
             || mc.player.isFallFlying()
             || mc.player.isInWater()
             || mc.player.isInLava()

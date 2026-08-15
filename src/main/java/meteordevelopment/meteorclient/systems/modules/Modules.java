@@ -408,7 +408,6 @@ public class Modules extends System<Modules> {
         add(new AutoWeapon());
         add(new AutoWeb());
         add(new BedAura());
-        add(new BowAimbot());
         add(new BowSpam());
         add(new BowTP());
         add(new Burrow());
@@ -473,7 +472,6 @@ public class Modules extends System<Modules> {
         add(new EntityControl());
         add(new FastClimb());
         add(new Flight());
-        add(new Grim());
         add(new GUIMove());
         add(new HighJump());
         add(new Jesus());
@@ -502,7 +500,6 @@ public class Modules extends System<Modules> {
         add(new BetterTooltips());
         add(new BlockESP());
         add(new BlockSelection());
-        add(new Blur());
         add(new BossStack());
         add(new Breadcrumbs());
         add(new BreakIndicators());
