@@ -5,7 +5,7 @@
       "file": "eyeye-client:textures/eyeye.png",
       "ascent": 7,
       "height": 8,
-      "chars": ["\\uE000"]
+      "chars": [""]
     }
   ]
 }
