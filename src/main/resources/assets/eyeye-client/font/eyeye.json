@@ -2,7 +2,7 @@
   "providers": [
     {
       "type": "bitmap",
-      "file": "eyeye-client:textures/eyeye.png",
+      "file": "eyeye-client:eyeye.png",
       "ascent": 7,
       "height": 8,
       "chars": [""]
