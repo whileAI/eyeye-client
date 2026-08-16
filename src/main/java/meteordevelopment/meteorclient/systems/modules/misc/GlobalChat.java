@@ -5,7 +5,6 @@
 
 package meteordevelopment.meteorclient.systems.modules.misc;
 
-import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.systems.modules.Categories;
@@ -13,7 +12,6 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -216,8 +214,7 @@ public class GlobalChat extends Module {
         } else return;
         if (author.isEmpty() || message.isEmpty()) return;
 
-        ChatUtils.sendMsg(Component.literal("\uE000 ").withStyle(style -> style.withFont(new FontDescription.Resource(MeteorClient.identifier("eyeye"))))
-            .append("[EyEye Chat] <").append(author).append("> ").append(message));
+        ChatUtils.sendMsg(Component.literal("[EyEye Chat] <").append(author).append("> ").append(message));
     }
 
     private class ChatListener implements WebSocket.Listener {

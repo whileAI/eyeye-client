@@ -16,10 +16,12 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.PlayerTabOverlay;
 import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.Scoreboard;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -33,6 +35,9 @@ import java.util.List;
 public abstract class PlayerTabOverlayMixin {
     @Shadow
     protected abstract List<PlayerInfo> getPlayerInfos();
+
+    @Shadow
+    public abstract Component getNameForDisplay(PlayerInfo info);
 
     @ModifyConstant(constant = @Constant(longValue = 80L), method = "getPlayerInfos")
     private long modifyCount(long count) {
@@ -93,6 +98,15 @@ public abstract class PlayerTabOverlayMixin {
         }
     }
 
+    @Inject(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", shift = At.Shift.AFTER))
+    private void renderEyEyeLogo(GuiGraphicsExtractor graphics, int screenWidth, Scoreboard scoreboard, Objective displayObjective, CallbackInfo ci, @Local(name = "info") PlayerInfo info, @Local(name = "xo") int xo, @Local(name = "yo") int yo) {
+        GlobalChat chat = Modules.get().get(GlobalChat.class);
+        if (!chat.isEyEyeUser(info.getProfile().name())) return;
+
+        int x = xo + Minecraft.getInstance().font.width(this.getNameForDisplay(info)) - 8;
+        graphics.blit(RenderPipelines.GUI_TEXTURED, MeteorClient.identifier("textures/eyeye.png"), x, yo, 0, 0, 8, 8, 1254, 1254, 1254, 1254, -1);
+    }
+
     @Unique
     private static Component withEyEyeMark(Component name, PlayerInfo info) {
         GlobalChat chat = Modules.get().get(GlobalChat.class);
@@ -100,7 +114,7 @@ public abstract class PlayerTabOverlayMixin {
 
         MutableComponent result = Component.empty();
         result.append(name);
-        result.append(Component.literal(" \uE000").withStyle(style -> style.withFont(new FontDescription.Resource(MeteorClient.identifier("eyeye")))));
+        result.append(Component.literal("  "));
         return result;
     }
 }

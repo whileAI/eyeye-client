@@ -20,6 +20,7 @@ import meteordevelopment.meteorclient.mixininterface.IGuiMessageVisible;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.misc.text.MeteorClickEvent;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
@@ -416,7 +417,7 @@ public class BetterChat extends Module {
     }
 
     static {
-        registerCustomHead("[EyEye]", MeteorClient.identifier("textures/icons/chat/eyeye.png"));
+        registerCustomHead("[EyEye Chat]", MeteorClient.identifier("textures/eyeye.png"));
         registerCustomHead("[Baritone]", MeteorClient.identifier("textures/icons/chat/baritone.png"));
     }
 
@@ -456,7 +457,8 @@ public class BetterChat extends Module {
         for (CustomHeadEntry entry : CUSTOM_HEAD_ENTRIES) {
             // Check prefix
             if (text.startsWith(entry.prefix(), startOffset)) {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, entry.texture(), 0, y, 0, 0, 8, 8, 64, 64, 64, 64, color);
+                if (entry.prefix().equals("[EyEye Chat]")) drawEyEyeLogo(graphics, y, color);
+                else graphics.blit(RenderPipelines.GUI_TEXTURED, entry.texture(), 0, y, 0, 0, 8, 8, 64, 64, 64, 64, color);
                 return;
             }
         }
@@ -468,7 +470,16 @@ public class BetterChat extends Module {
         PlayerInfo entry = mc.getConnection().getPlayerInfo(sender.id());
         if (entry == null) return;
 
+        if (Modules.get().get(GlobalChat.class).isEyEyeUser(sender.name())) {
+            drawEyEyeLogo(graphics, y, color);
+            return;
+        }
+
         PlayerFaceExtractor.extractRenderState(graphics, entry.getSkin(), 0, y, 8, color);
+    }
+
+    private void drawEyEyeLogo(GuiGraphicsExtractor graphics, int y, int color) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, MeteorClient.identifier("textures/eyeye.png"), 0, y, 0, 0, 8, 8, 1254, 1254, 1254, 1254, color);
     }
 
     private GameProfile getSender(IGuiMessage line, String text) {
