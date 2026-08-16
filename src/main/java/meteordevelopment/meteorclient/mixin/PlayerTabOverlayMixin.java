@@ -7,6 +7,7 @@ package meteordevelopment.meteorclient.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.misc.GlobalChat;
 import meteordevelopment.meteorclient.systems.modules.render.BetterTab;
@@ -16,7 +17,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.PlayerTabOverlay;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Mixin;
@@ -99,9 +100,7 @@ public abstract class PlayerTabOverlayMixin {
 
         MutableComponent result = Component.empty();
         result.append(name);
-        result.append(Component.literal(" ◉").withStyle(style -> style
-            .withColor(0x8AADF4)
-            .withHoverEvent(new HoverEvent.ShowText(Component.literal("Uses EyEye Client")))));
+        result.append(Component.literal(" \uE000").withStyle(style -> style.withFont(new FontDescription.Resource(MeteorClient.identifier("eyeye")))));
         return result;
     }
 }
