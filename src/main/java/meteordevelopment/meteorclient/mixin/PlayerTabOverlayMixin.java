@@ -8,6 +8,7 @@ package meteordevelopment.meteorclient.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import meteordevelopment.meteorclient.systems.modules.Modules;
+import meteordevelopment.meteorclient.systems.modules.misc.GlobalChat;
 import meteordevelopment.meteorclient.systems.modules.render.BetterTab;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -15,9 +16,12 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.PlayerTabOverlay;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -40,7 +44,12 @@ public abstract class PlayerTabOverlayMixin {
     public void getNameForDisplay(PlayerInfo info, CallbackInfoReturnable<Component> cir) {
         BetterTab betterTab = Modules.get().get(BetterTab.class);
 
-        if (betterTab.isActive()) cir.setReturnValue(betterTab.getPlayerName(info));
+        if (betterTab.isActive()) cir.setReturnValue(withEyEyeMark(betterTab.getPlayerName(info), info));
+    }
+
+    @Inject(method = "getNameForDisplay", at = @At("RETURN"), cancellable = true)
+    private void addEyEyeMark(PlayerInfo info, CallbackInfoReturnable<Component> cir) {
+        if (!Modules.get().get(BetterTab.class).isActive()) cir.setReturnValue(withEyEyeMark(cir.getReturnValue(), info));
     }
 
     @ModifyArg(method = "extractRenderState", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I"), index = 0)
@@ -81,5 +90,18 @@ public abstract class PlayerTabOverlayMixin {
             graphics.text(font, text, xo + slotWidth - font.width(text), yo, color);
             ci.cancel();
         }
+    }
+
+    @Unique
+    private static Component withEyEyeMark(Component name, PlayerInfo info) {
+        GlobalChat chat = Modules.get().get(GlobalChat.class);
+        if (!chat.isEyEyeUser(info.getProfile().name())) return name;
+
+        MutableComponent result = Component.empty();
+        result.append(name);
+        result.append(Component.literal(" ◉").withStyle(style -> style
+            .withColor(0x8AADF4)
+            .withHoverEvent(new HoverEvent.ShowText(Component.literal("Uses EyEye Client")))));
+        return result;
     }
 }

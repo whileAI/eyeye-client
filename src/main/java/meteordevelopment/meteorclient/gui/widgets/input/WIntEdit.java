@@ -6,6 +6,7 @@
 package meteordevelopment.meteorclient.gui.widgets.input;
 
 import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
+import meteordevelopment.meteorclient.utils.misc.MathExpression;
 
 public class WIntEdit extends WHorizontalList {
     private int value;
@@ -49,10 +50,11 @@ public class WIntEdit extends WHorizontalList {
             if (textBox.get().isEmpty()) value = 0;
             else if (textBox.get().equals("-")) value = -0;
             else {
-                try {
-                    value = Integer.parseInt(textBox.get());
-                } catch (NumberFormatException _) {}
+                Integer parsed = MathExpression.parseInt(textBox.get());
+                if (parsed != null) value = parsed;
             }
+
+            if (value != lastValue) textBox.set(Integer.toString(value));
 
             if (slider != null) slider.set(value);
 
@@ -79,24 +81,7 @@ public class WIntEdit extends WHorizontalList {
     }
 
     private boolean filter(String text, char c) {
-        boolean good;
-        boolean validate = true;
-
-        if (c == '-' && !text.contains("-") && textBox.cursor == 0) {
-            good = true;
-            validate = false;
-        }
-        else good = Character.isDigit(c);
-
-        if (good && validate) {
-            try {
-                Integer.parseInt(text + c);
-            } catch (NumberFormatException _) {
-                good = false;
-            }
-        }
-
-        return good;
+        return Character.isDigit(c) || "+-*/()".indexOf(c) >= 0 || Character.isWhitespace(c);
     }
 
     private void setButton(int v) {

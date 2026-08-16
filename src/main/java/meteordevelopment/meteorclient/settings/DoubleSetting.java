@@ -6,6 +6,7 @@
 package meteordevelopment.meteorclient.settings;
 
 import net.minecraft.nbt.CompoundTag;
+import meteordevelopment.meteorclient.utils.misc.MathExpression;
 
 import java.util.function.Consumer;
 
@@ -30,11 +31,7 @@ public class DoubleSetting extends Setting<Double> {
 
     @Override
     protected Double parseImpl(String str) {
-        try {
-            return Double.parseDouble(str.trim());
-        } catch (NumberFormatException _) {
-            return null;
-        }
+        return MathExpression.parseDouble(str);
     }
 
     @Override

@@ -17,56 +17,67 @@ export default {
     const server = normalize(new URL(request.url).searchParams.get("server") ?? "", 128);
     if (!server) return new Response("Missing server identifier.", { status: 400 });
 
+    const name = normalize(new URL(request.url).searchParams.get("name") ?? "", 32);
+    if (!name) return new Response("Missing player name.", { status: 400 });
+
     return env.GLOBAL_CHAT.getByName(server).fetch(request);
   }
 };
 
 export class GlobalChatRoom extends DurableObject<Env> {
-  private readonly sessions = new Set<WebSocket>();
+  private readonly sessions = new Map<WebSocket, string>();
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
 
-    this.ctx.getWebSockets().forEach(socket => this.sessions.add(socket));
+    this.ctx.getWebSockets().forEach(socket => {
+      const name = socket.deserializeAttachment();
+      if (typeof name === "string") this.sessions.set(socket, name);
+    });
   }
 
-  async fetch(_request: Request): Promise<Response> {
+  async fetch(request: Request): Promise<Response> {
+    const name = normalize(new URL(request.url).searchParams.get("name") ?? "", 32);
+    if (!name) return new Response("Missing player name.", { status: 400 });
+
     const [client, server] = Object.values(new WebSocketPair()) as [WebSocket, WebSocket];
     this.ctx.acceptWebSocket(server);
-    server.serializeAttachment(true);
-    this.sessions.add(server);
+    server.serializeAttachment(name);
+
+    this.sessions.forEach(existingName => server.send(`P\t${existingName}`));
+    this.sessions.set(server, name);
+    this.broadcast(`P\t${name}`);
 
     return new Response(null, { status: 101, webSocket: client });
   }
 
-  async webSocketMessage(_socket: WebSocket, message: string | ArrayBuffer): Promise<void> {
+  async webSocketMessage(socket: WebSocket, message: string | ArrayBuffer): Promise<void> {
     if (typeof message !== "string") return;
 
-    const payload = parseMessage(message);
-    if (!payload) return;
+    const name = this.sessions.get(socket);
+    if (!name || !message.startsWith("M\t")) return;
 
-    const broadcast = `${payload.author}\t${payload.message}`;
-    this.sessions.forEach(socket => {
+    const content = normalize(message.slice(2), 256);
+    if (!content) return;
+
+    this.broadcast(`M\t${name}\t${content}`);
+  }
+
+  async webSocketClose(socket: WebSocket): Promise<void> {
+    const name = this.sessions.get(socket);
+    this.sessions.delete(socket);
+    if (name) this.broadcast(`L\t${name}`);
+  }
+
+  private broadcast(message: string): void {
+    this.sessions.forEach((_name, socket) => {
       try {
-        socket.send(broadcast);
+        socket.send(message);
       } catch {
         this.sessions.delete(socket);
       }
     });
   }
-
-  async webSocketClose(socket: WebSocket): Promise<void> {
-    this.sessions.delete(socket);
-  }
-}
-
-function parseMessage(value: string): { author: string; message: string } | null {
-  const separator = value.indexOf("\t");
-  if (separator < 1) return null;
-
-  const author = normalize(value.slice(0, separator), 32);
-  const message = normalize(value.slice(separator + 1), 256);
-  return author && message ? { author, message } : null;
 }
 
 function normalize(value: string, maximumLength: number): string {

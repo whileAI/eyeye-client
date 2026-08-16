@@ -6,9 +6,7 @@
 package meteordevelopment.meteorclient.systems.modules.misc;
 
 import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
-import meteordevelopment.meteorclient.settings.Setting;
-import meteordevelopment.meteorclient.settings.SettingGroup;
-import meteordevelopment.meteorclient.settings.StringSetting;
+import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
@@ -21,25 +19,27 @@ import java.nio.charset.StandardCharsets;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.util.Locale;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class GlobalChat extends Module {
     private static final int MAX_MESSAGE_LENGTH = 256;
+    private static final int MAX_PENDING_MESSAGES = 20;
+    private static final long RECONNECT_DELAY_MS = 3_000;
     private static final String ENDPOINT = "wss://eyeye-global-chat.eyeye-local-chat.workers.dev/chat";
-
-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
-
-    private final Setting<String> nickname = sgGeneral.add(new StringSetting.Builder()
-        .name("nickname")
-        .description("Name shown in EyEye Chat. Uses your Minecraft name when empty.")
-        .defaultValue("")
-        .build()
-    );
 
     private final HttpClient client = HttpClient.newHttpClient();
     private final StringBuilder received = new StringBuilder();
+    private final Queue<String> pendingMessages = new ConcurrentLinkedQueue<>();
+    private final Set<String> eyeyeUsers = ConcurrentHashMap.newKeySet();
     private volatile WebSocket socket;
     private volatile String connectedServer = "";
+    private volatile boolean connecting;
+    private volatile long connectionAttempt;
+    private volatile long nextConnectionAttempt;
 
     public GlobalChat() {
         super(Categories.Misc, "global-chat", "Shares messages with EyEye users on the same server.");
@@ -47,19 +47,27 @@ public class GlobalChat extends Module {
 
     @Override
     public void onActivate() {
-        connect();
+        nextConnectionAttempt = 0;
+        ensureConnected();
     }
 
     @Override
     public void onDeactivate() {
-        disconnect();
+        disconnect(true);
     }
 
     @EventHandler
     private void onGameJoined(GameJoinedEvent event) {
         if (!isActive()) return;
-        disconnect();
-        connect();
+        disconnect(true);
+        nextConnectionAttempt = 0;
+        ensureConnected();
+    }
+
+    @EventHandler
+    private void onTick(TickEvent.Post event) {
+        ensureConnected();
+        flushMessages();
     }
 
     public boolean send(String message) {
@@ -77,27 +85,44 @@ public class GlobalChat extends Module {
         String content = sanitize(message);
         if (content.isEmpty()) return false;
 
-        WebSocket current = socket;
-        if (current == null || !server.equals(connectedServer)) {
-            disconnect();
-            connect();
-            warning("EyEye Chat is connecting. Try again in a moment.");
+        if (pendingMessages.size() >= MAX_PENDING_MESSAGES) {
+            error("EyEye Chat queue is full. Try again in a moment.");
             return false;
         }
 
-        current.sendText(getNickname() + "\t" + content, true);
+        pendingMessages.offer(content);
+        ensureConnected();
+        flushMessages();
         return true;
     }
 
-    private void connect() {
+    public boolean isEyEyeUser(String name) {
+        return eyeyeUsers.contains(normalizeName(name));
+    }
+
+    private void ensureConnected() {
         String server = getServer();
-        if (server.isEmpty()) return;
+        if (!isActive() || server.isEmpty() || connecting || System.currentTimeMillis() < nextConnectionAttempt) return;
+        if (socket != null && server.equals(connectedServer)) return;
+
+        disconnect(false);
+        connect(server);
+    }
+
+    private void connect(String server) {
+        long attempt = ++connectionAttempt;
+        connecting = true;
 
         try {
-            URI endpoint = URI.create(ENDPOINT + "?server=" + URLEncoder.encode(server, StandardCharsets.UTF_8));
-            client.newWebSocketBuilder().buildAsync(endpoint, new ChatListener()).whenComplete((connected, error) -> {
+            URI endpoint = URI.create(ENDPOINT + "?server=" + URLEncoder.encode(server, StandardCharsets.UTF_8) + "&name=" + URLEncoder.encode(getNickname(), StandardCharsets.UTF_8));
+            client.newWebSocketBuilder().buildAsync(endpoint, new ChatListener(attempt)).whenComplete((connected, error) -> {
+                if (attempt != connectionAttempt) {
+                    if (connected != null) connected.sendClose(WebSocket.NORMAL_CLOSURE, "Replaced");
+                    return;
+                }
+
                 if (error != null) {
-                    mc.execute(() -> warning("EyEye Chat connection failed: %s", error.getMessage()));
+                    connectionFailed(attempt, error);
                     return;
                 }
 
@@ -108,23 +133,45 @@ public class GlobalChat extends Module {
 
                 socket = connected;
                 connectedServer = server;
+                connecting = false;
+                nextConnectionAttempt = 0;
+                flushMessages();
                 mc.execute(() -> info("EyEye Chat enabled. Use ;chat <message>."));
             });
         } catch (IllegalArgumentException error) {
-            error("EyEye Chat endpoint is invalid.");
+            connectionFailed(attempt, error);
         }
     }
 
-    private void disconnect() {
+    private void connectionFailed(long attempt, Throwable error) {
+        if (attempt != connectionAttempt) return;
+        socket = null;
+        connectedServer = "";
+        connecting = false;
+        nextConnectionAttempt = System.currentTimeMillis() + RECONNECT_DELAY_MS;
+        mc.execute(() -> warning("EyEye Chat connection failed: %s", error.getMessage()));
+    }
+
+    private void disconnect(boolean clearPendingMessages) {
+        connectionAttempt++;
+        connecting = false;
         WebSocket current = socket;
         socket = null;
         connectedServer = "";
+        eyeyeUsers.clear();
+        if (clearPendingMessages) pendingMessages.clear();
         if (current != null) current.sendClose(WebSocket.NORMAL_CLOSURE, "Disabled");
     }
 
+    private void flushMessages() {
+        WebSocket current = socket;
+        if (current == null || !isActive()) return;
+
+        String message;
+        while ((message = pendingMessages.poll()) != null) current.sendText("M\t" + message, true);
+    }
+
     private String getNickname() {
-        String value = sanitize(nickname.get());
-        if (!value.isEmpty()) return value;
         return mc.player != null ? sanitize(mc.player.getName().getString()) : "EyEye User";
     }
 
@@ -141,18 +188,42 @@ public class GlobalChat extends Module {
         return normalized.substring(0, Math.min(normalized.length(), MAX_MESSAGE_LENGTH));
     }
 
-    private void receive(String payload) {
-        int separator = payload.indexOf('\t');
-        if (separator <= 0 || separator == payload.length() - 1) return;
+    private static String normalizeName(String value) {
+        return sanitize(value).toLowerCase(Locale.ROOT);
+    }
 
-        String author = sanitize(payload.substring(0, separator));
-        String message = sanitize(payload.substring(separator + 1));
+    private void receive(String payload) {
+        String[] parts = payload.split("\\t", 3);
+        if (parts.length == 2 && "P".equals(parts[0])) {
+            eyeyeUsers.add(normalizeName(parts[1]));
+            return;
+        }
+        if (parts.length == 2 && "L".equals(parts[0])) {
+            eyeyeUsers.remove(normalizeName(parts[1]));
+            return;
+        }
+
+        String author;
+        String message;
+        if (parts.length == 3 && "M".equals(parts[0])) {
+            author = sanitize(parts[1]);
+            message = sanitize(parts[2]);
+        } else if (parts.length == 2) {
+            author = sanitize(parts[0]);
+            message = sanitize(parts[1]);
+        } else return;
         if (author.isEmpty() || message.isEmpty()) return;
 
         ChatUtils.sendMsg(Component.literal("[EyEye Chat] <").append(author).append("> ").append(message));
     }
 
     private class ChatListener implements WebSocket.Listener {
+        private final long attempt;
+
+        private ChatListener(long attempt) {
+            this.attempt = attempt;
+        }
+
         @Override
         public void onOpen(WebSocket webSocket) {
             webSocket.request(1);
@@ -175,20 +246,23 @@ public class GlobalChat extends Module {
 
         @Override
         public void onError(WebSocket webSocket, Throwable error) {
-            forget(webSocket);
-            mc.execute(() -> warning("EyEye Chat connection lost: %s", error.getMessage()));
+            if (forget(webSocket)) connectionFailed(attempt, error);
         }
 
         @Override
         public CompletableFuture<?> onClose(WebSocket webSocket, int statusCode, String reason) {
-            forget(webSocket);
+            if (forget(webSocket) && isActive()) {
+                nextConnectionAttempt = System.currentTimeMillis() + RECONNECT_DELAY_MS;
+            }
             return CompletableFuture.completedFuture(null);
         }
 
-        private void forget(WebSocket webSocket) {
-            if (socket != webSocket) return;
+        private boolean forget(WebSocket webSocket) {
+            if (socket != webSocket || attempt != connectionAttempt) return false;
             socket = null;
             connectedServer = "";
+            connecting = false;
+            return true;
         }
     }
 }

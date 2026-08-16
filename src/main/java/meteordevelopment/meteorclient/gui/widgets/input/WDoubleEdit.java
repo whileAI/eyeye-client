@@ -6,6 +6,7 @@
 package meteordevelopment.meteorclient.gui.widgets.input;
 
 import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
+import meteordevelopment.meteorclient.utils.misc.MathExpression;
 
 import java.util.Locale;
 
@@ -54,10 +55,8 @@ public class WDoubleEdit extends WHorizontalList {
                 case "", ".", "-." -> value = 0;
                 case "-" -> value = -0;
                 default -> {
-                    try {
-                        value = Double.parseDouble(textBox.get());
-                    } catch (NumberFormatException _) {
-                    }
+                    Double parsed = MathExpression.parseDouble(textBox.get());
+                    if (parsed != null) value = parsed;
                 }
             }
 
@@ -66,7 +65,7 @@ public class WDoubleEdit extends WHorizontalList {
             if (value < min) value = min;
             else if (value > max) value = max;
 
-            if (value != preValidationValue) textBox.set(valueString());
+            if (value != preValidationValue || value != lastValue) textBox.set(valueString());
             if (slider != null) slider.set(value);
 
             if (value != lastValue) {
@@ -92,26 +91,7 @@ public class WDoubleEdit extends WHorizontalList {
     }
 
     private boolean filter(String text, char c) {
-        boolean good;
-        boolean validate = true;
-
-        if (c == '-' && !text.contains("-") && textBox.cursor == 0) {
-            good = true;
-            validate = false;
-        } else if (c == '.' && !text.contains(".")) {
-            good = true;
-            if (text.isEmpty()) validate = false;
-        } else good = Character.isDigit(c);
-
-        if (good && validate) {
-            try {
-                Double.parseDouble(text + c);
-            } catch (NumberFormatException _) {
-                good = false;
-            }
-        }
-
-        return good;
+        return Character.isDigit(c) || "+-*/().".indexOf(c) >= 0 || Character.isWhitespace(c);
     }
 
     private void setButton(double v) {

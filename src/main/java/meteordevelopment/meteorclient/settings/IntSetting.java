@@ -6,6 +6,7 @@
 package meteordevelopment.meteorclient.settings;
 
 import net.minecraft.nbt.CompoundTag;
+import meteordevelopment.meteorclient.utils.misc.MathExpression;
 
 import java.util.function.Consumer;
 
@@ -26,11 +27,7 @@ public class IntSetting extends Setting<Integer> {
 
     @Override
     protected Integer parseImpl(String str) {
-        try {
-            return Integer.parseInt(str.trim());
-        } catch (NumberFormatException _) {
-            return null;
-        }
+        return MathExpression.parseInt(str);
     }
 
     @Override

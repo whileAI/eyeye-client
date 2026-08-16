@@ -39,6 +39,7 @@ public abstract class SplashManagerMixin {
     @Unique
     private static List<String> getMeteorSplashes() {
         return List.of(
+            "creit prozhekt 777",
             "EyEye on Crack!",
             "Star EyEye Client on GitHub!",
             "Based utility mod.",
