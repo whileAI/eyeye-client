@@ -103,7 +103,7 @@ public abstract class PlayerTabOverlayMixin {
         GlobalChat chat = Modules.get().get(GlobalChat.class);
         if (!chat.isEyEyeUser(info.getProfile().name())) return;
 
-        int x = xo + Minecraft.getInstance().font.width(this.getNameForDisplay(info)) - 8;
+        int x = xo + Minecraft.getInstance().font.width(this.getNameForDisplay(info)) - 10;
         graphics.blit(RenderPipelines.GUI_TEXTURED, MeteorClient.identifier("textures/eyeye.png"), x, yo, 0, 0, 8, 8, 1254, 1254, 1254, 1254, -1);
     }
 
@@ -114,7 +114,7 @@ public abstract class PlayerTabOverlayMixin {
 
         MutableComponent result = Component.empty();
         result.append(name);
-        result.append(Component.literal("  "));
+        result.append(Component.literal("   "));
         return result;
     }
 }

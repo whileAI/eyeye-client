@@ -422,24 +422,36 @@ public class BetterChat extends Module {
     }
 
     public int modifyChatWidth(int width) {
-        if (isActive() && playerHeads.get()) return width + 10;
+        if ((isActive() && playerHeads.get()) || isEyEyeLine()) return width + 10;
         return width;
     }
 
 
     public void beforeDrawMessage(GuiGraphicsExtractor graphics, int y, int color) {
-        if (!isActive() || !playerHeads.get() || line == null) return;
+        if (line == null) return;
 
         // Only draw the first line of multi line messages
         if (((IGuiMessageVisible) (Object) line).meteor$isStartOfEntry()) {
-            drawTexture(graphics, (IGuiMessage) (Object) line, y, color);
+            IGuiMessage message = (IGuiMessage) (Object) line;
+            if (isActive() && playerHeads.get()) drawTexture(graphics, message, y, color);
+            else if (isEyEyeLine(message)) drawEyEyeLogo(graphics, y, color);
         }
     }
 
     public void afterDrawMessage() {
-        if (!isActive() || !playerHeads.get()) return;
-
         line = null;
+    }
+
+    private boolean isEyEyeLine() {
+        return line != null && isEyEyeLine((IGuiMessage) (Object) line);
+    }
+
+    private boolean isEyEyeLine(IGuiMessage line) {
+        String text = line.meteor$getText().trim();
+        if (text.startsWith("[EyEye Chat]")) return true;
+
+        GameProfile sender = getSender(line, text);
+        return sender != null && Modules.get().get(GlobalChat.class).isEyEyeUser(sender.name());
     }
 
     private void drawTexture(GuiGraphicsExtractor graphics, IGuiMessage line, int y, int color) {
