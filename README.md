@@ -1,50 +1,74 @@
-
 <p align="center">
-<img src="https://raw.githubusercontent.com/whileAI/eyeye-client/master/imgs/logo.png" alt="EyEye Client logo" width="15%"/>
+  <img src="https://raw.githubusercontent.com/whileAI/eyeye-client/master/imgs/logo.png" alt="EyEye Client logo" width="128">
 </p>
 
-<h1 align="center">EyEye</h1>
-<p align="center">A Minecraft Fabric Utility Mod for anarchy servers.</p>
+<h1 align="center">EyEye Client</h1>
 
-<div align="center">
-</div>
+<p align="center">Free and open-source Fabric utility client for Minecraft.</p>
 
-## Usage
+<p align="center">
+  <a href="#installation">Installation</a> ·
+  <a href="#building">Building</a> ·
+  <a href="#credits">Credits</a> ·
+  <a href="https://github.com/whileAI/eyeye-client/issues">Issues</a>
+</p>
 
-### Building
-- Clone this repository
-- Run `./gradlew build`
+## About
 
-### Installation
-Place the built JAR in the Minecraft `mods` folder and start Fabric.
+EyEye Client is a fork of [Meteor Client](https://github.com/MeteorDevelopment/meteor-client), redesigned and extended with its own tools and interface.
 
-### EyEye Chat
-Use `;chat-status true` to enable EyEye Chat and `;chat <message>` to send a message. Chat messages are isolated by the current multiplayer server, so users on different servers cannot see each other. Use `;chat-status false` to stop receiving messages.
+## Highlights
 
-## Contributions
-We will review and help with all reasonable pull requests as long as the guidelines below are met.
+- Fabric mod with an in-game Click GUI
+- Embedded Baritone integration
+- EyEye Chat for players on the same server
+- Movement, render, world and automation modules
+- Fully open source under GPL-3.0
 
-- The license header must be applied to all java source code files.
-- IDE or system-related files should be added to the `.gitignore`, never committed in pull requests.
-- In general, check existing code to make sure your code matches relatively close to the code already in the project.
-- Favour readability over compactness.
-- If you need help, check out the [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html) for a reference.
+## Installation
 
-## Bugs and Suggestions
-Bug reports and suggestions should be made in this repository's issue tracker.  
-Please provide as much information as you can to best help us understand your issue and give a better chance of it being resolved.
+1. Install Fabric Loader for the Minecraft version supported by the release.
+2. Download the latest EyEye Client JAR from [Releases](https://github.com/whileAI/eyeye-client/releases).
+3. Place the JAR into your Minecraft instance `mods` folder.
+4. Launch the game.
+
+## EyEye Chat
+
+Enable chat reception:
+
+```text
+;chat-status true
+```
+
+Send a message to EyEye users on the same multiplayer server:
+
+```text
+;chat Your message
+```
+
+Disable it at any time with `;chat-status false`.
+
+## Building
+
+```bash
+./gradlew build
+```
+
+The built JAR is placed in `build/libs`.
+
+## Contributing
+
+Pull requests and issues are welcome. Keep changes focused, follow the existing code style, and do not commit IDE or system files.
 
 ## Credits
 
 - [whileAI](https://github.com/whileAI) — development and design
 - [vexarofc](https://github.com/vexarofc) — created ideas and helped bring them to life
 - [ChatGPT / OpenAI](https://github.com/openai) — coding assistance and ideas
+- [Meteor Client contributors](https://github.com/MeteorDevelopment/meteor-client/graphs/contributors) — original project
 
-## Licensing
-This project is licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html). 
+## License
 
-If you use **ANY** code from the source:
-- You must disclose the source code of your modified work and the source code you took from this project. This means you are not allowed to use code from this project (even partially) in a closed-source and/or obfuscated application.
-- You must state clearly and obviously to all end users that you are using code from this project.
-- Your application must also be licensed under the same license.
+EyEye Client is licensed under the [GNU General Public License v3.0](LICENSE).
 
+Any modified or redistributed version that includes EyEye Client code must remain open source under GPL-3.0 and provide its source code.
