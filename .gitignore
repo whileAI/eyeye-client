@@ -11,7 +11,7 @@ bin
 logs
 .github/builds/node_modules
 .github/moderation/node_modules
-website-concepts/
+/web-site/
 *.iws
 *.ipr
 *.iml

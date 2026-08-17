@@ -524,6 +524,7 @@ public class Modules extends System<Modules> {
         add(new StorageESP());
         add(new TimeChanger());
         add(new Tracers());
+        add(new Watermark());
         add(new Trail());
         add(new Trajectories());
         add(new TunnelESP());
@@ -559,6 +560,7 @@ public class Modules extends System<Modules> {
         add(new SpawnProofer());
         add(new Timer());
         add(new VeinMiner());
+        add(new VillagerAutoEnchantment());
 
         if (BaritoneUtils.IS_AVAILABLE) {
             add(new Excavator());
