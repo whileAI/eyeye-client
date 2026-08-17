@@ -14,7 +14,8 @@
     .site { width: min(1420px, 100%); margin: auto; padding: 0 22px; }
     .stage { position: relative; min-height: 720px; overflow: hidden; border-top: 1px solid #6554a6; border-radius: 0 0 68px 10px; background: #0a1326; isolation: isolate; }
     #stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; opacity: .7; }
-    .atmosphere { position: absolute; inset: -35%; z-index: -3; background: radial-gradient(ellipse at var(--px) var(--py), rgba(165,102,255,.52), transparent 18%), radial-gradient(ellipse at 52% 112%, rgba(177,108,255,.92), transparent 30%), radial-gradient(ellipse at 16% 20%, rgba(64,82,177,.5), transparent 30%), linear-gradient(115deg, #0b1428 20%, #191637 62%, #091225); filter: blur(6px) saturate(1.1); animation: atmospheric 12s ease-in-out infinite alternate; }
+    .atmosphere { position: absolute; inset: -35%; z-index: -3; background: radial-gradient(ellipse at 52% 112%, rgba(177,108,255,.92), transparent 30%), radial-gradient(ellipse at 16% 20%, rgba(64,82,177,.5), transparent 30%), linear-gradient(115deg, #0b1428 20%, #191637 62%, #091225); filter: blur(6px) saturate(1.1); animation: atmospheric 12s ease-in-out infinite alternate; }
+    .cursor-glow { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: radial-gradient(circle 210px at var(--px) var(--py), rgba(165,102,255,.5), transparent 72%); transition: opacity .25s; }
     .atmosphere::before { content: ""; position: absolute; width: 34%; height: 120%; left: 27%; top: -10%; background: linear-gradient(120deg, transparent 10%, rgba(132,102,255,.18) 48%, transparent 75%); transform: rotate(-14deg); filter: blur(30px); animation: beam 9s ease-in-out infinite alternate; }
     .atmosphere::after { content: ""; position: absolute; width: 30%; height: 58%; right: 2%; bottom: 8%; border-radius: 48%; background: #070d19; filter: blur(34px); opacity: .72; animation: cloud 11s ease-in-out infinite alternate; }
     nav { height: 82px; padding: 0 7vw; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 5; }
@@ -29,6 +30,7 @@
     .lead { max-width: 590px; margin: 0; color: #c0c3d2; font-size: 17px; line-height: 1.65; }
     .actions { display: flex; align-items: center; gap: 10px; margin-top: 30px; }
     .primary { height: 48px; display: inline-flex; align-items: center; gap: 16px; padding: 5px 6px 5px 19px; border-radius: 999px; color: #11131b; background: #f5f4fb; text-decoration: none; font-size: 13px; font-weight: 700; box-shadow: 0 12px 40px rgba(0,0,0,.22); }.primary span { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: white; background: linear-gradient(135deg, #7255d9, #a15cf5); transition: transform .25s; }.primary:hover span { transform: rotate(-35deg) scale(1.05); }
+    .download-slider { position: relative; width: 214px; height: 48px; padding-left: 19px; display: flex; align-items: center; overflow: hidden; border-radius: 999px; color: #11131b; background: #f5f4fb; box-shadow: 0 12px 40px rgba(0,0,0,.22); font-size: 13px; font-weight: 700; user-select: none; touch-action: none; }.download-slider::after { content: "drag left to download"; position: absolute; left: 19px; bottom: 6px; color: #777585; font: 7px ui-monospace, monospace; letter-spacing: .07em; text-transform: uppercase; }.download-slider-label { transform: translateY(-5px); }.download-handle { position: absolute; top: 5px; right: 5px; width: 38px; height: 38px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; color: white; background: linear-gradient(135deg, #7255d9, #a15cf5); box-shadow: 0 4px 16px rgba(80,48,160,.35); cursor: grab; font-size: 16px; transition: left .3s ease, right .3s ease, transform .15s; }.download-handle:active { cursor: grabbing; transform: scale(.94); }.download-handle:focus-visible { outline: 2px solid white; outline-offset: 3px; }.download-slider.dragging .download-handle { transition: transform .15s; }.download-slider.complete .download-handle { left: 5px !important; right: auto; }.download-slider.complete::after { content: "opening release"; }
     .secondary { height: 48px; padding: 0 20px; display: inline-flex; align-items: center; gap: 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,.13); background: rgba(17,15,39,.28); backdrop-filter: blur(12px); color: #e4e2ec; text-decoration: none; font-size: 13px; }.secondary::before { content: ""; width: 8px; height: 8px; border: 2px solid #aaa6bc; border-radius: 3px; transform: rotate(45deg); }
     .microcopy { margin-top: 18px; color: rgba(220,223,240,.48); font: 10px ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; }
     .edge-note { position: absolute; left: 2.1vw; top: 50%; transform: rotate(-90deg) translateX(-50%); transform-origin: left center; color: rgba(224,228,245,.4); font: 10px ui-monospace, monospace; letter-spacing: .16em; text-transform: uppercase; }
@@ -53,14 +55,14 @@
 <body>
   <div class="site">
     <header class="stage">
-      <canvas id="stars" aria-hidden="true"></canvas><div class="atmosphere"></div>
+      <canvas id="stars" aria-hidden="true"></canvas><div class="atmosphere"></div><div class="cursor-glow"></div>
       <nav><a class="brand" href="#"><span class="mark"><img src="../assets/eyeye.png" alt="EyEye Client logo"></span><span>EyEye Client</span></a><div class="navlinks"><a href="#features">Features</a><a href="https://github.com/whileAI/eyeye-client">Source</a><a class="nav-button" href="https://github.com/whileAI/eyeye-client/releases">Get EyEye →</a></div></nav>
-      <div class="hero"><a class="release" href="https://github.com/whileAI/eyeye-client/releases"><i></i>Version 1.8.9 is available <span>→</span></a><h1><span class="soft">A sharper way to play</span><br>Minecraft.</h1><p class="lead">Automation, movement and vision tools designed as one quiet layer over the game.</p><div class="actions"><a class="primary" href="https://github.com/whileAI/eyeye-client/releases">Download client <span>↗</span></a><a class="secondary" href="https://github.com/whileAI/eyeye-client">View source</a></div><div class="microcopy">Free · Fabric · Minecraft 26.2 · Open source</div><div class="edge-note">Observe everything / miss nothing</div><div class="corner-signal"></div></div>
+      <div class="hero"><a class="release" href="https://github.com/whileAI/eyeye-client/releases"><i></i>Version 1.8.9 is available <span>→</span></a><h1><span class="soft">A sharper way to play</span><br>Minecraft.</h1><p class="lead">Automation, movement and vision tools designed as one quiet layer over the game.</p><div class="actions"><div class="download-slider"><span class="download-slider-label">Download client</span><button class="download-handle" type="button" aria-label="Drag left to download EyEye Client">←</button></div><a class="secondary" href="https://github.com/whileAI/eyeye-client">View source</a></div><div class="microcopy">Free · Fabric · Minecraft 26.2 · Open source</div><div class="edge-note">Observe everything / miss nothing</div><div class="corner-signal"></div></div>
     </header>
     <section class="signal-strip" aria-label="Core capabilities"><div class="signal-item"><b><i class="pulse"></i>Smart Auto Mine</b><span>Automated routing</span></div><div class="signal-item"><b><i class="pulse"></i>EyEye Chat</b><span>Same-server link</span></div><div class="signal-item"><b><i class="pulse"></i>Baritone</b><span>Embedded engine</span></div><div class="signal-item"><b><i class="pulse"></i>Anti Invisible</b><span>Visibility control</span></div><div class="signal-item"><b><i class="pulse"></i>Strafe</b><span>Ground + air</span></div></section>
     <main>
       <section class="section product" id="features"><div class="copy"><div class="overline">One interface. Every advantage.</div><h2>Powerful without feeling complicated.</h2><p>Find a module, tune exactly what matters and get back to the game. EyEye keeps deep control behind a calm interface.</p><a class="text-link" href="https://github.com/whileAI/eyeye-client"><i>→</i> Explore the source</a></div><div class="interface"><div class="window"><aside class="side"><div class="side-head"><img src="../assets/eyeye.png" alt=""><b>EyEye</b></div><div class="group">MOVEMENT</div><div class="module on">Strafe<span class="switch"></span></div><div class="module">Flight<span class="switch"></span></div><div class="module">BowTP<span class="switch"></span></div><div class="group">WORLD</div><div class="module on">Smart Mine<span class="switch"></span></div><div class="module">Vein Miner<span class="switch"></span></div></aside><div class="panel"><small>WORLD / AUTOMATION</small><h3>Smart Auto Mine</h3><p>Find resources and let integrated Baritone choose the route.</p><div class="setting"><div class="setting-row"><span>Search radius</span><span class="value">128</span></div><div class="setting-row"><span>Priority</span><span class="value">Nearest</span></div><div class="setting-row"><span>Transparency</span><span class="bar"><i></i></span></div><div class="setting-row"><span>Active</span><span class="switch"></span></div></div></div></div></div></section>
-      <section class="section principles"><h2>Different by<br>what it removes.</h2><div class="principle-list"><div class="principle"><span>01</span><b>No custom launcher</b><i>↗</i></div><div class="principle"><span>02</span><b>No separate Baritone mod</b><i>↗</i></div><div class="principle"><span>03</span><b>No subscription</b><i>↗</i></div><div class="principle"><span>04</span><b>No closed source</b><i>↗</i></div></div></section>
+      <section class="section principles"><h2>Different by<br>what it removes.</h2><div class="principle-list"><div class="principle"><span>01</span><b>No custom launcher</b><i>↗</i></div><div class="principle"><span>02</span><b>No separate Baritone mod</b><i>↗</i></div><div class="principle"><span>03</span><b>No subscription</b><i>↗</i></div><div class="principle"><span>04</span><b>Open Source</b><i>↗</i></div></div></section>
       <section class="closing"><div class="closing-content"><h2>Your next favorite<br>Minecraft client.</h2><p>One JAR. Full control. Free forever.</p><a class="primary" href="https://github.com/whileAI/eyeye-client/releases">Download EyEye <span>↗</span></a></div></section>
     </main>
     <footer><span>EyEye Client · whileai + gpt</span><span>Forked from Meteor Client</span></footer>
@@ -99,10 +101,51 @@
     }
 
     addEventListener('resize', resize, { passive: true });
-    addEventListener('pointermove', event => {
-      document.documentElement.style.setProperty('--px', `${event.clientX / innerWidth * 100}%`);
-      document.documentElement.style.setProperty('--py', `${event.clientY / innerHeight * 100}%`);
+    const stage = document.querySelector('.stage');
+    stage.addEventListener('pointermove', event => {
+      const bounds = stage.getBoundingClientRect();
+      document.documentElement.style.setProperty('--px', `${event.clientX - bounds.left}px`);
+      document.documentElement.style.setProperty('--py', `${event.clientY - bounds.top}px`);
     }, { passive: true });
+
+    const slider = document.querySelector('.download-slider');
+    const handle = slider.querySelector('.download-handle');
+    const releaseUrl = 'https://github.com/whileAI/eyeye-client/releases';
+    let dragStartX = 0;
+    let handleStart = 0;
+
+    function download() {
+      if (slider.classList.contains('complete')) return;
+      slider.classList.add('complete');
+      slider.querySelector('.download-slider-label').textContent = 'Ready';
+      setTimeout(() => location.href = releaseUrl, 350);
+    }
+
+    handle.addEventListener('pointerdown', event => {
+      dragStartX = event.clientX;
+      handleStart = handle.offsetLeft;
+      slider.classList.add('dragging');
+      handle.setPointerCapture(event.pointerId);
+    });
+    handle.addEventListener('pointermove', event => {
+      if (!slider.classList.contains('dragging')) return;
+      const left = Math.max(5, Math.min(handleStart + event.clientX - dragStartX, slider.clientWidth - handle.offsetWidth - 5));
+      handle.style.right = 'auto';
+      handle.style.left = `${left}px`;
+      if (left <= 8) download();
+    });
+    handle.addEventListener('pointerup', () => {
+      slider.classList.remove('dragging');
+      if (slider.classList.contains('complete')) return;
+      handle.style.left = '';
+      handle.style.right = '';
+    });
+    handle.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        download();
+      }
+    });
     resize();
     draw();
   </script>
