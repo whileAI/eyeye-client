@@ -15,7 +15,6 @@
     .stage { position: relative; min-height: 720px; overflow: hidden; border-top: 1px solid #6554a6; border-radius: 0 0 68px 10px; background: #0a1326; isolation: isolate; }
     #stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; opacity: .7; }
     .atmosphere { position: absolute; inset: -35%; z-index: -3; background: radial-gradient(ellipse at 52% 112%, rgba(177,108,255,.92), transparent 30%), radial-gradient(ellipse at 16% 20%, rgba(64,82,177,.5), transparent 30%), linear-gradient(115deg, #0b1428 20%, #191637 62%, #091225); filter: blur(6px) saturate(1.1); animation: atmospheric 12s ease-in-out infinite alternate; }
-    .cursor-glow { position: absolute; left: -195px; top: -53px; width: 390px; height: 106px; z-index: -2; pointer-events: none; border-radius: 50%; background: radial-gradient(ellipse 150px 16px at center, rgba(220,196,255,.72), transparent 72%), radial-gradient(ellipse 390px 105px at center, rgba(150,86,255,.42), transparent 74%); filter: blur(2px); mix-blend-mode: screen; will-change: transform; }
     .atmosphere::before { content: ""; position: absolute; width: 34%; height: 120%; left: 27%; top: -10%; background: linear-gradient(120deg, transparent 10%, rgba(132,102,255,.18) 48%, transparent 75%); transform: rotate(-14deg); filter: blur(30px); animation: beam 9s ease-in-out infinite alternate; }
     .atmosphere::after { content: ""; position: absolute; width: 30%; height: 58%; right: 2%; bottom: 8%; border-radius: 48%; background: #070d19; filter: blur(34px); opacity: .72; animation: cloud 11s ease-in-out infinite alternate; }
     nav { height: 82px; padding: 0 7vw; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 5; }
@@ -54,7 +53,7 @@
 <body>
   <div class="site">
     <header class="stage">
-      <canvas id="stars" aria-hidden="true"></canvas><div class="atmosphere"></div><div class="cursor-glow"></div>
+      <canvas id="stars" aria-hidden="true"></canvas><div class="atmosphere"></div>
       <nav><a class="brand" href="#"><span class="mark"><img src="../assets/eyeye.png" alt="EyEye Client logo"></span><span>EyEye Client</span></a><div class="navlinks"><a href="#features">Features</a><a href="docs/index.html">Docs</a><a href="https://github.com/whileAI/eyeye-client">Source</a><a class="nav-button" href="https://github.com/whileAI/eyeye-client/releases">Get EyEye →</a></div></nav>
       <div class="hero"><a class="release" href="https://github.com/whileAI/eyeye-client/releases"><i></i>Version 1.8.9 is available <span>→</span></a><h1><span class="soft">A sharper way to play</span><br>Minecraft.</h1><p class="lead">Automation, movement and vision tools designed as one quiet layer over the game.</p><div class="actions"><div class="download-slider"><span class="download-slider-label">Download client</span><button class="download-handle" type="button" aria-label="Drag left to download EyEye Client">←</button></div><a class="secondary" href="https://github.com/whileAI/eyeye-client">View source</a></div><div class="edge-note">Observe everything / miss nothing</div><div class="corner-signal"></div></div>
     </header>
@@ -82,17 +81,42 @@
         y: Math.random() * canvas.clientHeight,
         radius: Math.random() * 1.35 + .25,
         speed: Math.random() * .08 + .025,
-        alpha: Math.random() * .55 + .18
+        alpha: Math.random() * .55 + .18,
+        depth: Math.random() * .85 + .15,
+        ease: Math.random() * .024 + .009,
+        offsetX: 0,
+        offsetY: 0
       }));
     }
 
     function draw() {
       context.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+      starPointer.x += (starPointer.targetX - starPointer.x) * .045;
+      starPointer.y += (starPointer.targetY - starPointer.y) * .045;
       for (const star of stars) {
         star.y -= star.speed;
         if (star.y < -4) star.y = canvas.clientHeight + 4;
+        const previousX = star.offsetX;
+        const previousY = star.offsetY;
+        const targetX = starPointer.x * canvas.clientWidth * .065 * star.depth;
+        const targetY = starPointer.y * canvas.clientHeight * .055 * star.depth;
+        star.offsetX += (targetX - star.offsetX) * star.ease;
+        star.offsetY += (targetY - star.offsetY) * star.ease;
+        const x = star.x + star.offsetX;
+        const y = star.y + star.offsetY;
+        const velocityX = star.offsetX - previousX;
+        const velocityY = star.offsetY - previousY - star.speed;
+        const velocity = Math.hypot(velocityX, velocityY);
+        if (velocity > .06) {
+          context.beginPath();
+          context.moveTo(x, y);
+          context.lineTo(x - velocityX * 22, y - velocityY * 22);
+          context.strokeStyle = `rgba(177,164,255,${Math.min(star.alpha * velocity * 1.8, .42)})`;
+          context.lineWidth = Math.max(.25, star.radius * .45);
+          context.stroke();
+        }
         context.beginPath();
-        context.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        context.arc(x, y, star.radius, 0, Math.PI * 2);
         context.fillStyle = `rgba(222,225,255,${star.alpha})`;
         context.fill();
       }
@@ -101,27 +125,16 @@
 
     addEventListener('resize', resize, { passive: true });
     const stage = document.querySelector('.stage');
-    const glow = document.querySelector('.cursor-glow');
-    const glowPosition = { x: stage.clientWidth / 2, y: stage.clientHeight * .4 };
-    const glowTarget = { ...glowPosition };
+    const starPointer = { x: 0, y: 0, targetX: 0, targetY: 0 };
     stage.addEventListener('pointermove', event => {
       const bounds = stage.getBoundingClientRect();
-      glowTarget.x = event.clientX - bounds.left;
-      glowTarget.y = event.clientY - bounds.top;
+      starPointer.targetX = ((event.clientX - bounds.left) / bounds.width - .5) * 2;
+      starPointer.targetY = ((event.clientY - bounds.top) / bounds.height - .5) * 2;
     }, { passive: true });
-
-    function animateGlow() {
-      const dx = glowTarget.x - glowPosition.x;
-      const dy = glowTarget.y - glowPosition.y;
-      const speed = Math.hypot(dx, dy);
-      const easing = reduceMotion ? 1 : .085;
-      glowPosition.x += dx * easing;
-      glowPosition.y += dy * easing;
-      const tilt = Math.max(-9, Math.min(9, dx * .025));
-      const stretch = 1 + Math.min(speed / 650, .28);
-      glow.style.transform = `translate3d(${glowPosition.x}px, ${glowPosition.y}px, 0) rotate(${tilt}deg) scaleX(${stretch})`;
-      if (!reduceMotion) requestAnimationFrame(animateGlow);
-    }
+    stage.addEventListener('pointerleave', () => {
+      starPointer.targetX = 0;
+      starPointer.targetY = 0;
+    }, { passive: true });
 
     const slider = document.querySelector('.download-slider');
     const handle = slider.querySelector('.download-handle');
@@ -181,7 +194,6 @@
     });
     resize();
     draw();
-    animateGlow();
   </script>
 </body>
 </html>
