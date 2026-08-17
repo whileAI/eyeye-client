@@ -31,7 +31,7 @@ public class DiscordPresence extends Module {
         DiscordIPC.setOnError((code, message) -> error("Discord RPC error %d: %s", code, message));
 
         rpc.setStart(System.currentTimeMillis() / 1000L);
-        rpc.setDetails("Best free client");
+        rpc.setDetails("Your next favorite Minecraft client.");
         rpc.setLargeImage("eyeye", "EyEye Client");
         rpc.setSmallImage("minecraft", "Minecraft " + SharedConstants.getCurrentVersion().name());
 
