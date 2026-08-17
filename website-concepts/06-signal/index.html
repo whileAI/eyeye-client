@@ -28,8 +28,7 @@
     h1 { max-width: 900px; margin: 28px auto 18px; font-size: clamp(53px, 6.6vw, 94px); line-height: .99; letter-spacing: -.064em; text-wrap: balance; }.soft { color: transparent; background: linear-gradient(105deg, #fff 10%, #d3d7ed 52%, #aaa2d2); background-clip: text; }
     .lead { max-width: 590px; margin: 0; color: #c0c3d2; font-size: 17px; line-height: 1.65; }
     .actions { display: flex; align-items: center; gap: 10px; margin-top: 30px; }
-    .primary { height: 48px; display: inline-flex; align-items: center; gap: 16px; padding: 5px 6px 5px 19px; border-radius: 999px; color: #11131b; background: #f5f4fb; text-decoration: none; font-size: 13px; font-weight: 700; box-shadow: 0 12px 40px rgba(0,0,0,.22); }.primary span { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: white; background: linear-gradient(135deg, #7255d9, #a15cf5); transition: transform .25s; }.primary:hover span { transform: rotate(-35deg) scale(1.05); }
-    .download-slider { position: relative; width: 214px; height: 48px; padding-left: 19px; display: flex; align-items: center; overflow: hidden; border-radius: 999px; color: #11131b; background: #f5f4fb; box-shadow: 0 12px 40px rgba(0,0,0,.22); font-size: 13px; font-weight: 700; user-select: none; touch-action: none; }.download-handle { position: absolute; top: 5px; right: 5px; width: 38px; height: 38px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; color: white; background: linear-gradient(135deg, #7255d9, #a15cf5); box-shadow: 0 4px 16px rgba(80,48,160,.35); cursor: grab; font-size: 16px; transition: left .3s ease, right .3s ease, transform .15s; }.download-handle:active { cursor: grabbing; transform: scale(.94); }.download-handle:focus-visible { outline: 2px solid white; outline-offset: 3px; }.download-slider.dragging .download-handle { transition: transform .15s; }.download-slider.complete .download-handle { left: 5px !important; right: auto; opacity: 0; }.rocket { position: fixed; z-index: 100; margin: 0; pointer-events: none; overflow: visible; box-shadow: 0 0 26px rgba(153,91,255,.85); }.rocket::after { content: ""; position: absolute; left: 88%; top: 15px; width: 62px; height: 8px; border-radius: 50%; background: linear-gradient(90deg, rgba(225,211,255,.85), rgba(140,81,255,.42), transparent); filter: blur(4px); }
+    .download-slider { --progress: 0; position: relative; width: 214px; height: 48px; padding-left: 19px; display: flex; align-items: center; overflow: hidden; border-radius: 999px; color: #11131b; background: #f5f4fb; box-shadow: 0 12px 40px rgba(0,0,0,.22); font-size: 13px; font-weight: 700; user-select: none; touch-action: none; }.download-slider::before { content: ""; position: absolute; inset: 0 0 0 auto; width: calc(var(--progress) * 100%); background: linear-gradient(90deg, rgba(178,143,255,.05), rgba(142,91,255,.25)); transition: width .45s cubic-bezier(.2,.8,.2,1); }.download-slider-label { position: relative; z-index: 1; transform: translateX(calc(var(--progress) * 8px)); opacity: calc(1 - var(--progress) * .34); transition: transform .12s, opacity .12s; }.download-handle { position: absolute; top: 5px; right: 5px; z-index: 2; width: 38px; height: 38px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; color: white; background: linear-gradient(135deg, #7255d9, #a15cf5); box-shadow: 0 4px 16px rgba(80,48,160,.35); cursor: grab; font-size: 16px; transition: left .52s cubic-bezier(.22,1.35,.4,1), right .52s cubic-bezier(.22,1.35,.4,1), transform .15s, box-shadow .15s; }.download-handle:active { cursor: grabbing; transform: scale(.92); }.download-handle:focus-visible { outline: 2px solid white; outline-offset: 3px; }.download-slider.dragging::before,.download-slider.dragging .download-handle { transition: transform .15s, box-shadow .15s; }.download-slider.dragging .download-handle { box-shadow: 0 0 24px rgba(132,75,255,.62); }.download-slider.complete .download-handle { left: 5px !important; right: auto; opacity: 0; }.closing .download-slider { margin: 0 auto; }.rocket { position: fixed; z-index: 100; margin: 0; pointer-events: none; overflow: visible; opacity: 1 !important; box-shadow: 0 0 26px rgba(153,91,255,.85); }.rocket::after { content: ""; position: absolute; left: 88%; top: 15px; width: 70px; height: 8px; border-radius: 50%; background: linear-gradient(90deg, rgba(240,230,255,.95), rgba(140,81,255,.5), transparent); filter: blur(4px); animation: exhaust .09s ease-in-out infinite alternate; }
     .secondary { height: 48px; padding: 0 20px; display: inline-flex; align-items: center; gap: 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,.13); background: rgba(17,15,39,.28); backdrop-filter: blur(12px); color: #e4e2ec; text-decoration: none; font-size: 13px; }.secondary::before { content: ""; width: 8px; height: 8px; border: 2px solid #aaa6bc; border-radius: 3px; transform: rotate(45deg); }
     .edge-note { position: absolute; left: 2.1vw; top: 50%; transform: rotate(-90deg) translateX(-50%); transform-origin: left center; color: rgba(224,228,245,.4); font: 10px ui-monospace, monospace; letter-spacing: .16em; text-transform: uppercase; }
     .corner-signal { position: absolute; right: 34px; bottom: 28px; width: 130px; height: 60px; border-right: 1px solid rgba(255,255,255,.2); border-bottom: 1px solid rgba(255,255,255,.2); border-radius: 0 0 30px 0; }.corner-signal::before { content: "SIGNAL / 01"; position: absolute; right: 9px; bottom: 9px; color: rgba(255,255,255,.36); font: 9px ui-monospace, monospace; }
@@ -45,8 +44,8 @@
     .principles { display: grid; grid-template-columns: .72fr 1.28fr; gap: 8vw; align-items: start; }.principles h2 { margin: 0; font-size: clamp(46px, 7vw, 96px); line-height: .88; letter-spacing: -.07em; }.principle-list { border-top: 1px solid var(--line); }.principle { display: grid; grid-template-columns: 52px 1fr auto; align-items: center; min-height: 120px; border-bottom: 1px solid var(--line); transition: padding .2s; }.principle:hover { padding-inline: 10px; }.principle span { color: #606b83; font: 10px ui-monospace, monospace; }.principle b { font-size: 22px; letter-spacing: -.03em; }.principle i { width: 31px; height: 31px; display: grid; place-items: center; border: 1px solid #28344b; border-radius: 50%; font-style: normal; color: #7c8ca9; }
     .closing { position: relative; min-height: 570px; margin-bottom: 28px; border-radius: 12px 56px 12px 56px; overflow: hidden; display: grid; place-items: center; text-align: center; background: #0b1428; border: 1px solid rgba(255,255,255,.07); }.closing::before { content: ""; position: absolute; width: 850px; height: 420px; bottom: -280px; border-radius: 50%; background: #8c4cf5; filter: blur(70px); opacity: .85; animation: closingGlow 7s ease-in-out infinite alternate; }.closing::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 28%, rgba(180,152,255,.12), transparent 68%); animation: sweep 8s linear infinite; }.closing-content { position: relative; z-index: 2; }.closing h2 { margin: 0 0 22px; font-size: clamp(50px, 7.8vw, 108px); line-height: .91; letter-spacing: -.067em; }.closing p { color: #c8c5d2; margin-bottom: 30px; }
     footer { min-height: 92px; display: flex; align-items: center; justify-content: space-between; padding: 0 3vw; color: #5f6b82; font-size: 11px; }
-    @keyframes atmospheric { to { transform: scale(1.05) translate(2%, -1%); } } @keyframes beam { to { transform: rotate(-5deg) translateX(18%); opacity: .55; } } @keyframes cloud { to { transform: translate(-60px, -20px) scale(1.12); } } @keyframes halo { 50% { transform: scale(1.15); opacity: .18; } } @keyframes productGlow { to { transform: translate(-80px, 45px) scale(.78); } } @keyframes closingGlow { to { transform: translateX(150px) scale(1.15); } } @keyframes sweep { to { transform: translateX(45%); } }
-    @media (max-width: 850px) { .site { padding: 0 10px }.stage { min-height: 700px; border-radius: 0 0 42px 8px } nav { padding: 0 20px }.navlinks a:not(.nav-button) { display: none }.hero { padding-inline: 18px }.edge-note,.corner-signal { display: none }.actions { flex-direction: column }.primary,.secondary { width: 220px; justify-content: center }.signal-strip { grid-template-columns: 1fr 1fr; padding-block: 45px }.signal-item:nth-child(odd) { border-left: 0 }.product { grid-template-columns: 1fr; padding: 80px 24px; }.interface { transform: none; min-height: 420px }.window { min-height: 400px; grid-template-columns: 1fr }.side { display: none }.panel { padding: 25px }.principles { grid-template-columns: 1fr; }.principles h2 { margin-bottom: 55px }.section { padding: 80px 26px }.closing { min-height: 520px; padding: 30px }.footer { padding-inline: 10px } }
+    @keyframes atmospheric { to { transform: scale(1.05) translate(2%, -1%); } } @keyframes beam { to { transform: rotate(-5deg) translateX(18%); opacity: .55; } } @keyframes cloud { to { transform: translate(-60px, -20px) scale(1.12); } } @keyframes halo { 50% { transform: scale(1.15); opacity: .18; } } @keyframes productGlow { to { transform: translate(-80px, 45px) scale(.78); } } @keyframes closingGlow { to { transform: translateX(150px) scale(1.15); } } @keyframes sweep { to { transform: translateX(45%); } } @keyframes exhaust { to { transform: scaleX(.72); opacity: .62; } }
+    @media (max-width: 850px) { .site { padding: 0 10px }.stage { min-height: 700px; border-radius: 0 0 42px 8px } nav { padding: 0 20px }.navlinks a:not(.nav-button) { display: none }.hero { padding-inline: 18px }.edge-note,.corner-signal { display: none }.actions { flex-direction: column }.download-slider,.secondary { width: 220px; justify-content: center }.signal-strip { grid-template-columns: 1fr 1fr; padding-block: 45px }.signal-item:nth-child(odd) { border-left: 0 }.product { grid-template-columns: 1fr; padding: 80px 24px; }.interface { transform: none; min-height: 420px }.window { min-height: 400px; grid-template-columns: 1fr }.side { display: none }.panel { padding: 25px }.principles { grid-template-columns: 1fr; }.principles h2 { margin-bottom: 55px }.section { padding: 80px 26px }.closing { min-height: 520px; padding: 30px }.footer { padding-inline: 10px } }
     @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
   </style>
 </head>
@@ -61,7 +60,7 @@
     <main>
       <section class="section product" id="features"><div class="copy"><div class="overline">One interface. Every advantage.</div><h2>Powerful without feeling complicated.</h2><p>Find a module, tune exactly what matters and get back to the game. EyEye keeps deep control behind a calm interface.</p><a class="text-link" href="https://github.com/whileAI/eyeye-client"><i>→</i> Explore the source</a></div><div class="interface"><div class="window"><aside class="side"><div class="side-head"><img src="../assets/eyeye.png" alt=""><b>EyEye</b></div><div class="group">MOVEMENT</div><div class="module on">Strafe<span class="switch"></span></div><div class="module">Flight<span class="switch"></span></div><div class="module">BowTP<span class="switch"></span></div><div class="group">WORLD</div><div class="module on">Smart Mine<span class="switch"></span></div><div class="module">Vein Miner<span class="switch"></span></div></aside><div class="panel"><small>WORLD / AUTOMATION</small><h3>Smart Auto Mine</h3><p>Find resources and let integrated Baritone choose the route.</p><div class="setting"><div class="setting-row"><span>Search radius</span><span class="value">128</span></div><div class="setting-row"><span>Priority</span><span class="value">Nearest</span></div><div class="setting-row"><span>Transparency</span><span class="bar"><i></i></span></div><div class="setting-row"><span>Active</span><span class="switch"></span></div></div></div></div></div></section>
       <section class="section principles"><h2>Different by<br>what it removes.</h2><div class="principle-list"><div class="principle"><span>01</span><b>No custom launcher</b><i>↗</i></div><div class="principle"><span>02</span><b>No separate Baritone mod</b><i>↗</i></div><div class="principle"><span>03</span><b>No subscription</b><i>↗</i></div><div class="principle"><span>04</span><b>Open Source</b><i>↗</i></div></div></section>
-      <section class="closing"><div class="closing-content"><h2>Your next favorite<br>Minecraft client.</h2><p>One JAR. Full control. Free forever.</p><a class="primary" href="https://github.com/whileAI/eyeye-client/releases">Download EyEye <span>↗</span></a></div></section>
+      <section class="closing"><div class="closing-content"><h2>Your next favorite<br>Minecraft client.</h2><p>One JAR. Full control. Free forever.</p><div class="download-slider"><span class="download-slider-label">Download EyEye</span><button class="download-handle" type="button" aria-label="Drag left to download EyEye Client">←</button></div></div></section>
     </main>
     <footer><span>EyEye Client · whileai + gpt</span><span>Forked from Meteor Client</span></footer>
   </div>
@@ -136,16 +135,36 @@
       starPointer.targetY = 0;
     }, { passive: true });
 
-    const slider = document.querySelector('.download-slider');
-    const handle = slider.querySelector('.download-handle');
     const releaseUrl = 'https://github.com/whileAI/eyeye-client/releases';
-    let dragStartX = 0;
-    let handleStart = 0;
 
-    function download() {
+    function flightPath() {
+      const jitter = range => (Math.random() - .5) * range;
+      const points = [
+        { x: 0, y: 0, scale: 1 },
+        { x: -86, y: -8 + jitter(10), scale: 1.08 },
+        { x: -180 + jitter(55), y: -105 + jitter(45), scale: .98 },
+        { x: -82 + jitter(70), y: -205 + jitter(45), scale: .86 },
+        { x: -255 + jitter(80), y: -315 + jitter(55), scale: .66 },
+        { x: -120 + jitter(90), y: -500, scale: .2 }
+      ];
+      return points.map((point, index) => {
+        const next = points[Math.min(index + 1, points.length - 1)];
+        const previous = points[Math.max(0, index - 1)];
+        const direction = index === points.length - 1 ? { x: point.x - previous.x, y: point.y - previous.y } : { x: next.x - point.x, y: next.y - point.y };
+        const rotation = Math.atan2(direction.y, direction.x) * 180 / Math.PI - 180;
+        return {
+          transform: `translate(${point.x}px, ${point.y}px) rotate(${rotation}deg) scale(${point.scale})`,
+          opacity: index === points.length - 1 ? 0 : 1,
+          offset: index / (points.length - 1)
+        };
+      });
+    }
+
+    function launch(slider, handle) {
       if (slider.classList.contains('complete')) return;
       const bounds = handle.getBoundingClientRect();
       slider.classList.add('complete');
+      slider.style.setProperty('--progress', 1);
       slider.querySelector('.download-slider-label').textContent = 'Ready';
       if (reduceMotion) {
         setTimeout(() => location.href = releaseUrl, 200);
@@ -156,42 +175,57 @@
       rocket.removeAttribute('aria-label');
       Object.assign(rocket.style, { left: `${bounds.left}px`, top: `${bounds.top}px`, right: 'auto' });
       document.body.append(rocket);
-      rocket.animate([
-        { transform: 'translate(0, 0) rotate(0deg) scale(1)', opacity: 1 },
-        { transform: 'translate(-82px, -10px) rotate(7deg) scale(1.08)', offset: .16 },
-        { transform: 'translate(-160px, -95px) rotate(48deg) scale(.98)', offset: .38 },
-        { transform: 'translate(-70px, -190px) rotate(134deg) scale(.88)', offset: .58 },
-        { transform: 'translate(-240px, -290px) rotate(31deg) scale(.7)', offset: .79 },
-        { transform: 'translate(-110px, -470px) rotate(127deg) scale(.25)', opacity: 0 }
-      ], { duration: 1250, easing: 'cubic-bezier(.45,.05,.28,1)', fill: 'forwards' });
-      setTimeout(() => location.href = releaseUrl, 1200);
+      rocket.animate(flightPath(), { duration: 1380, easing: 'cubic-bezier(.42,.04,.24,1)', fill: 'forwards' });
+      setTimeout(() => location.href = releaseUrl, 1320);
     }
 
-    handle.addEventListener('pointerdown', event => {
-      dragStartX = event.clientX;
-      handleStart = handle.offsetLeft;
-      slider.classList.add('dragging');
-      handle.setPointerCapture(event.pointerId);
-    });
-    handle.addEventListener('pointermove', event => {
-      if (!slider.classList.contains('dragging')) return;
-      const left = Math.max(5, Math.min(handleStart + event.clientX - dragStartX, slider.clientWidth - handle.offsetWidth - 5));
-      handle.style.right = 'auto';
-      handle.style.left = `${left}px`;
-      if (left <= 8) download();
-    });
-    handle.addEventListener('pointerup', () => {
-      slider.classList.remove('dragging');
-      if (slider.classList.contains('complete')) return;
-      handle.style.left = '';
-      handle.style.right = '';
-    });
-    handle.addEventListener('keydown', event => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        download();
+    function setupDownloadSlider(slider) {
+      const handle = slider.querySelector('.download-handle');
+      let dragStartX = 0;
+      let handleStart = 0;
+
+      function reset() {
+        slider.classList.remove('dragging');
+        if (slider.classList.contains('complete')) return;
+        const restingLeft = slider.clientWidth - handle.offsetWidth - 5;
+        handle.style.left = `${restingLeft}px`;
+        slider.style.setProperty('--progress', 0);
+        setTimeout(() => {
+          if (slider.classList.contains('dragging')) return;
+          handle.style.left = '';
+          handle.style.right = '';
+        }, 540);
       }
-    });
+
+      handle.addEventListener('pointerdown', event => {
+        dragStartX = event.clientX;
+        handleStart = handle.offsetLeft;
+        slider.classList.add('dragging');
+        handle.setPointerCapture(event.pointerId);
+      });
+      handle.addEventListener('pointermove', event => {
+        if (!slider.classList.contains('dragging')) return;
+        const maxLeft = slider.clientWidth - handle.offsetWidth - 5;
+        const left = Math.max(5, Math.min(handleStart + event.clientX - dragStartX, maxLeft));
+        const progress = (maxLeft - left) / (maxLeft - 5);
+        handle.style.right = 'auto';
+        handle.style.left = `${left}px`;
+        slider.style.setProperty('--progress', progress.toFixed(3));
+        if (left <= 8) launch(slider, handle);
+      });
+      handle.addEventListener('pointerup', reset);
+      handle.addEventListener('pointercancel', reset);
+      handle.addEventListener('keydown', event => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        handle.style.right = 'auto';
+        handle.style.left = '5px';
+        slider.style.setProperty('--progress', 1);
+        setTimeout(() => launch(slider, handle), reduceMotion ? 0 : 280);
+      });
+    }
+
+    document.querySelectorAll('.download-slider').forEach(setupDownloadSlider);
     resize();
     draw();
   </script>
