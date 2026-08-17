@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="EyEye Client — your next favorite Minecraft client.">
+  <title>EyEye Client — See Beyond</title>
+  <style>
+    :root { color-scheme: dark; --bg: #07080c; --panel: #11131b; --line: #25293a; --blue: #8aadf4; --violet: #9d8cff; --text: #f7f8ff; --muted: #9298ab; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--text); background: var(--bg); overflow-x: hidden; }
+    body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px); background-size: 44px 44px; mask-image: linear-gradient(to bottom, black, transparent 75%); }
+    .glow { position: absolute; width: 620px; height: 620px; border-radius: 50%; filter: blur(100px); opacity: .18; background: #5068ff; top: -280px; left: 50%; transform: translateX(-50%); pointer-events: none; }
+    .wrap { width: min(1180px, calc(100% - 40px)); margin: auto; position: relative; }
+    nav { height: 84px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 750; letter-spacing: -.02em; }
+    .brand img { width: 34px; height: 34px; border-radius: 10px; object-fit: cover; box-shadow: 0 0 0 1px #34394d; }
+    .navlinks { display: flex; gap: 28px; }
+    .navlinks a { color: var(--muted); text-decoration: none; font-size: 14px; }
+    .navlinks a:hover { color: white; }
+    .nav-cta, .button { color: #080a0f; background: white; text-decoration: none; padding: 11px 17px; border-radius: 10px; font-weight: 750; font-size: 14px; }
+    .hero { min-height: 710px; display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: 70px; padding: 72px 0 90px; }
+    .eyebrow { display: flex; align-items: center; gap: 10px; color: var(--blue); font: 700 12px ui-monospace, monospace; text-transform: uppercase; letter-spacing: .13em; }
+    .eyebrow::before { content: ""; width: 30px; height: 1px; background: currentColor; }
+    h1 { margin: 22px 0; max-width: 720px; font-size: clamp(56px, 7.2vw, 104px); line-height: .92; letter-spacing: -.075em; }
+    .gradient { color: transparent; background: linear-gradient(100deg, #fff 15%, var(--blue), var(--violet)); background-clip: text; }
+    .lead { max-width: 590px; color: var(--muted); font-size: 18px; line-height: 1.7; }
+    .actions { display: flex; gap: 12px; margin-top: 34px; }
+    .button { padding: 14px 20px; }
+    .button.secondary { color: white; background: transparent; border: 1px solid var(--line); }
+    .meta { display: flex; gap: 22px; margin-top: 24px; color: #747b91; font: 12px ui-monospace, monospace; }
+    .visual { position: relative; min-height: 520px; display: grid; place-items: center; }
+    .orbit { position: absolute; width: 430px; aspect-ratio: 1; border: 1px solid #272c42; border-radius: 50%; animation: spin 24s linear infinite; }
+    .orbit::before, .orbit::after { content: ""; position: absolute; border-radius: 50%; background: var(--blue); box-shadow: 0 0 24px var(--blue); }
+    .orbit::before { width: 8px; height: 8px; top: 41px; left: 65px; }
+    .orbit::after { width: 5px; height: 5px; bottom: 56px; right: 53px; }
+    .logo-stage { width: 320px; aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle, #181d31, #0a0c12 65%); box-shadow: inset 0 0 0 1px #2b3044, 0 45px 100px #000; }
+    .logo-stage img { width: 72%; height: 72%; object-fit: contain; filter: drop-shadow(0 0 32px rgba(138,173,244,.28)); }
+    .floating { position: absolute; padding: 13px 16px; border: 1px solid #2b3043; background: rgba(15,17,25,.82); backdrop-filter: blur(14px); border-radius: 12px; color: #b7bdcf; font: 12px ui-monospace, monospace; box-shadow: 0 20px 50px #0008; }
+    .floating.one { top: 62px; right: -10px; }.floating.two { bottom: 70px; left: -14px; }.dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #79e09f; margin-right: 8px; box-shadow: 0 0 12px #79e09f; }
+    .product { border: 1px solid var(--line); border-radius: 24px; background: linear-gradient(140deg, #12151f, #0b0d13); padding: 14px; box-shadow: 0 60px 140px #000; }
+    .window { min-height: 520px; border-radius: 15px; overflow: hidden; background: #0b0d12; display: grid; grid-template-columns: 210px 1fr; }
+    .sidebar { border-right: 1px solid #292d3b; padding: 22px 16px; }
+    .side-title { color: #697087; font: 10px ui-monospace, monospace; letter-spacing: .12em; margin: 24px 8px 10px; }
+    .module { display: flex; justify-content: space-between; padding: 10px; margin: 3px 0; border-radius: 7px; color: #a7acbc; font-size: 13px; }
+    .module.active { color: white; background: #1e2230; }.toggle { width: 24px; height: 13px; border-radius: 10px; background: #34394a; }.active .toggle { background: var(--blue); }
+    .mainpanel { padding: 44px; position: relative; background: radial-gradient(circle at 70% 20%, #1b2340, transparent 42%); }
+    .mainpanel h2 { font-size: 38px; letter-spacing: -.05em; margin: 0 0 10px; }
+    .mainpanel p { color: var(--muted); max-width: 470px; line-height: 1.6; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 44px; }
+    .stat { padding: 20px; border-radius: 12px; border: 1px solid #29304a; background: #111520aa; }
+    .stat b { display: block; font-size: 25px; margin-bottom: 5px; }.stat span { color: #7e869d; font-size: 12px; }
+    .features { padding: 120px 0; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; margin-bottom: 34px; }
+    .section-head h2 { margin: 0; font-size: clamp(38px, 5vw, 64px); letter-spacing: -.055em; }.section-head p { max-width: 420px; color: var(--muted); line-height: 1.6; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card { min-height: 270px; border: 1px solid var(--line); border-radius: 18px; padding: 26px; background: #0d0f16; display: flex; flex-direction: column; justify-content: space-between; }
+    .card:hover { border-color: #4d577b; background: #11141e; }
+    .card-index { color: var(--blue); font: 12px ui-monospace, monospace; }.card h3 { font-size: 25px; margin: 0 0 9px; }.card p { color: var(--muted); line-height: 1.6; margin: 0; }
+    footer { margin-top: 40px; padding: 38px 0 46px; border-top: 1px solid var(--line); color: #777e91; display: flex; justify-content: space-between; font-size: 13px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 850px) { .hero { grid-template-columns: 1fr; }.visual { min-height: 430px }.orbit { width: 360px }.logo-stage { width: 270px }.window { grid-template-columns: 1fr }.sidebar { display: none }.cards { grid-template-columns: 1fr }.section-head { display: block }.navlinks { display: none }.stats { grid-template-columns: 1fr }.mainpanel { padding: 28px }.meta { flex-wrap: wrap } }
+  </style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="wrap">
+    <nav>
+      <div class="brand"><img src="../assets/eyeye.png" alt="EyEye logo"><span>EyEye Client</span></div>
+      <div class="navlinks"><a href="#features">Features</a><a href="#interface">Interface</a><a href="https://github.com/whileAI/eyeye-client">Source</a></div>
+      <a class="nav-cta" href="https://github.com/whileAI/eyeye-client/releases">Download</a>
+    </nav>
+    <main>
+      <section class="hero">
+        <div>
+          <div class="eyebrow">Version 1.8.9 · Minecraft 26.2</div>
+          <h1>See the game <span class="gradient">beyond limits.</span></h1>
+          <p class="lead">A focused utility client with integrated Baritone, smart automation and a clean interface built for players who want complete control.</p>
+          <div class="actions"><a class="button" href="https://github.com/whileAI/eyeye-client/releases">Download for Fabric</a><a class="button secondary" href="https://github.com/whileAI/eyeye-client">View on GitHub</a></div>
+          <div class="meta"><span>FREE &amp; OPEN SOURCE</span><span>WINDOWS · LINUX · MACOS</span></div>
+        </div>
+        <div class="visual" aria-label="EyEye identity artwork">
+          <div class="orbit"></div><div class="logo-stage"><img src="../assets/eyeye.png" alt="EyEye Client eye mark"></div>
+          <div class="floating one"><span class="dot"></span>EyEye Chat connected</div><div class="floating two">BARITONE / EMBEDDED</div>
+        </div>
+      </section>
+      <section class="product" id="interface">
+        <div class="window">
+          <aside class="sidebar"><div class="brand"><img src="../assets/eyeye.png" alt=""><span>Modules</span></div><div class="side-title">MOVEMENT</div><div class="module active"><span>Strafe</span><span class="toggle"></span></div><div class="module"><span>Flight</span><span class="toggle"></span></div><div class="module"><span>BowTP</span><span class="toggle"></span></div><div class="side-title">WORLD</div><div class="module active"><span>Smart Auto Mine</span><span class="toggle"></span></div><div class="module"><span>Vein Miner</span><span class="toggle"></span></div></aside>
+          <div class="mainpanel"><div class="eyebrow">Live system</div><h2>Your game. Your rules.</h2><p>Every module is searchable, configurable and designed to stay out of your way until you need it.</p><div class="stats"><div class="stat"><b>100+</b><span>UTILITY MODULES</span></div><div class="stat"><b>26.2</b><span>MINECRAFT BUILD</span></div><div class="stat"><b>0</b><span>EXTRA BARITONE MODS</span></div></div></div>
+        </div>
+      </section>
+      <section class="features" id="features"><div class="section-head"><h2>Built to stay useful.</h2><p>No bloated launcher. No unnecessary setup. Put the JAR in your mods folder and start playing.</p></div><div class="cards"><article class="card"><span class="card-index">01 / AUTOMATE</span><div><h3>Smart mining</h3><p>Target resources, calculate routes and let embedded Baritone handle the repetitive work.</p></div></article><article class="card"><span class="card-index">02 / CONNECT</span><div><h3>EyEye Chat</h3><p>Talk to other EyEye users on the same Minecraft server without leaving the game.</p></div></article><article class="card"><span class="card-index">03 / CONTROL</span><div><h3>Precise settings</h3><p>Expressions, profiles and clean controls make complex configurations feel immediate.</p></div></article></div></section>
+    </main>
+    <footer><span>EyEye Client · Forked from Meteor Client</span><span>whileai + gpt</span></footer>
+  </div>
+</body>
+</html>
