@@ -15,7 +15,7 @@
     .stage { position: relative; min-height: 720px; overflow: hidden; border-top: 1px solid #6554a6; border-radius: 0 0 68px 10px; background: #0a1326; isolation: isolate; }
     #stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; opacity: .7; }
     .atmosphere { position: absolute; inset: -35%; z-index: -3; background: radial-gradient(ellipse at 52% 112%, rgba(177,108,255,.92), transparent 30%), radial-gradient(ellipse at 16% 20%, rgba(64,82,177,.5), transparent 30%), linear-gradient(115deg, #0b1428 20%, #191637 62%, #091225); filter: blur(6px) saturate(1.1); animation: atmospheric 12s ease-in-out infinite alternate; }
-    .cursor-glow { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: radial-gradient(circle 210px at var(--px) var(--py), rgba(165,102,255,.5), transparent 72%); transition: opacity .25s; }
+    .cursor-glow { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: radial-gradient(ellipse 150px 16px at var(--px) var(--py), rgba(220,196,255,.72), transparent 72%), radial-gradient(ellipse 390px 105px at var(--px) var(--py), rgba(150,86,255,.42), transparent 74%); filter: blur(2px); mix-blend-mode: screen; }
     .atmosphere::before { content: ""; position: absolute; width: 34%; height: 120%; left: 27%; top: -10%; background: linear-gradient(120deg, transparent 10%, rgba(132,102,255,.18) 48%, transparent 75%); transform: rotate(-14deg); filter: blur(30px); animation: beam 9s ease-in-out infinite alternate; }
     .atmosphere::after { content: ""; position: absolute; width: 30%; height: 58%; right: 2%; bottom: 8%; border-radius: 48%; background: #070d19; filter: blur(34px); opacity: .72; animation: cloud 11s ease-in-out infinite alternate; }
     nav { height: 82px; padding: 0 7vw; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 5; }
@@ -30,7 +30,7 @@
     .lead { max-width: 590px; margin: 0; color: #c0c3d2; font-size: 17px; line-height: 1.65; }
     .actions { display: flex; align-items: center; gap: 10px; margin-top: 30px; }
     .primary { height: 48px; display: inline-flex; align-items: center; gap: 16px; padding: 5px 6px 5px 19px; border-radius: 999px; color: #11131b; background: #f5f4fb; text-decoration: none; font-size: 13px; font-weight: 700; box-shadow: 0 12px 40px rgba(0,0,0,.22); }.primary span { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: white; background: linear-gradient(135deg, #7255d9, #a15cf5); transition: transform .25s; }.primary:hover span { transform: rotate(-35deg) scale(1.05); }
-    .download-slider { position: relative; width: 214px; height: 48px; padding-left: 19px; display: flex; align-items: center; overflow: hidden; border-radius: 999px; color: #11131b; background: #f5f4fb; box-shadow: 0 12px 40px rgba(0,0,0,.22); font-size: 13px; font-weight: 700; user-select: none; touch-action: none; }.download-slider::after { content: "drag left to download"; position: absolute; left: 19px; bottom: 6px; color: #777585; font: 7px ui-monospace, monospace; letter-spacing: .07em; text-transform: uppercase; }.download-slider-label { transform: translateY(-5px); }.download-handle { position: absolute; top: 5px; right: 5px; width: 38px; height: 38px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; color: white; background: linear-gradient(135deg, #7255d9, #a15cf5); box-shadow: 0 4px 16px rgba(80,48,160,.35); cursor: grab; font-size: 16px; transition: left .3s ease, right .3s ease, transform .15s; }.download-handle:active { cursor: grabbing; transform: scale(.94); }.download-handle:focus-visible { outline: 2px solid white; outline-offset: 3px; }.download-slider.dragging .download-handle { transition: transform .15s; }.download-slider.complete .download-handle { left: 5px !important; right: auto; }.download-slider.complete::after { content: "opening release"; }
+    .download-slider { position: relative; width: 214px; height: 48px; padding-left: 19px; display: flex; align-items: center; overflow: hidden; border-radius: 999px; color: #11131b; background: #f5f4fb; box-shadow: 0 12px 40px rgba(0,0,0,.22); font-size: 13px; font-weight: 700; user-select: none; touch-action: none; }.download-handle { position: absolute; top: 5px; right: 5px; width: 38px; height: 38px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; color: white; background: linear-gradient(135deg, #7255d9, #a15cf5); box-shadow: 0 4px 16px rgba(80,48,160,.35); cursor: grab; font-size: 16px; transition: left .3s ease, right .3s ease, transform .15s; }.download-handle:active { cursor: grabbing; transform: scale(.94); }.download-handle:focus-visible { outline: 2px solid white; outline-offset: 3px; }.download-slider.dragging .download-handle { transition: transform .15s; }.download-slider.complete .download-handle { left: 5px !important; right: auto; opacity: 0; }.rocket { position: fixed; z-index: 100; margin: 0; pointer-events: none; box-shadow: 12px 12px 22px rgba(153,91,255,.7), 25px 25px 30px rgba(111,78,255,.3); }
     .secondary { height: 48px; padding: 0 20px; display: inline-flex; align-items: center; gap: 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,.13); background: rgba(17,15,39,.28); backdrop-filter: blur(12px); color: #e4e2ec; text-decoration: none; font-size: 13px; }.secondary::before { content: ""; width: 8px; height: 8px; border: 2px solid #aaa6bc; border-radius: 3px; transform: rotate(45deg); }
     .microcopy { margin-top: 18px; color: rgba(220,223,240,.48); font: 10px ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; }
     .edge-note { position: absolute; left: 2.1vw; top: 50%; transform: rotate(-90deg) translateX(-50%); transform-origin: left center; color: rgba(224,228,245,.4); font: 10px ui-monospace, monospace; letter-spacing: .16em; text-transform: uppercase; }
@@ -116,9 +116,26 @@
 
     function download() {
       if (slider.classList.contains('complete')) return;
+      const bounds = handle.getBoundingClientRect();
       slider.classList.add('complete');
       slider.querySelector('.download-slider-label').textContent = 'Ready';
-      setTimeout(() => location.href = releaseUrl, 350);
+      if (reduceMotion) {
+        setTimeout(() => location.href = releaseUrl, 200);
+        return;
+      }
+      const rocket = handle.cloneNode(true);
+      rocket.className = 'download-handle rocket';
+      rocket.removeAttribute('aria-label');
+      Object.assign(rocket.style, { left: `${bounds.left}px`, top: `${bounds.top}px`, right: 'auto' });
+      document.body.append(rocket);
+      rocket.animate([
+        { transform: 'translate(0, 0) rotate(0deg) scale(1)', opacity: 1 },
+        { transform: 'translate(72px, -36px) rotate(38deg) scale(1.08)', offset: .18 },
+        { transform: 'translate(-48px, -128px) rotate(-32deg) scale(.95)', offset: .42 },
+        { transform: 'translate(138px, -236px) rotate(76deg) scale(.82)', offset: .7 },
+        { transform: 'translate(42px, -430px) rotate(145deg) scale(.35)', opacity: 0 }
+      ], { duration: 1050, easing: 'cubic-bezier(.45,.05,.28,1)', fill: 'forwards' });
+      setTimeout(() => location.href = releaseUrl, 1000);
     }
 
     handle.addEventListener('pointerdown', event => {
