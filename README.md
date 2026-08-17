@@ -35,8 +35,10 @@ Bug reports and suggestions should be made in this repository's issue tracker.
 Please provide as much information as you can to best help us understand your issue and give a better chance of it being resolved.
 
 ## Credits
-- whileai
-- GPT
+
+- [whileAI](https://github.com/whileAI) — development and design
+- [vexarofc](https://github.com/vexarofc) — created ideas and helped bring them to life
+- [ChatGPT / OpenAI](https://github.com/openai) — coding assistance and ideas
 
 ## Licensing
 This project is licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html). 
