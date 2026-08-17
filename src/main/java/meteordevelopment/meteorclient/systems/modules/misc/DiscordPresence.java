@@ -19,6 +19,7 @@ public class DiscordPresence extends Module {
     private static final RichPresence rpc = new RichPresence();
 
     private String lastState = "";
+    private int reconnectTicks;
 
     public DiscordPresence() {
         super(Categories.Misc, "discord-presence", "Shows your EyEye Client activity on Discord.");
@@ -27,15 +28,15 @@ public class DiscordPresence extends Module {
 
     @Override
     public void onActivate() {
-        DiscordIPC.start(APPLICATION_ID, null);
+        DiscordIPC.setOnError((code, message) -> error("Discord RPC error %d: %s", code, message));
 
         rpc.setStart(System.currentTimeMillis() / 1000L);
         rpc.setDetails("Best free client");
         rpc.setLargeImage("eyeye", "EyEye Client");
         rpc.setSmallImage("minecraft", "Minecraft " + SharedConstants.getCurrentVersion().name());
 
-        lastState = "";
-        updatePresence();
+        reconnectTicks = 100;
+        connect();
     }
 
     @Override
@@ -45,7 +46,20 @@ public class DiscordPresence extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
+        if (!DiscordIPC.isConnected()) {
+            if (++reconnectTicks >= 100) connect();
+            return;
+        }
+
         updatePresence();
+    }
+
+    private void connect() {
+        reconnectTicks = 0;
+        if (!DiscordIPC.start(APPLICATION_ID, () -> {
+            lastState = "";
+            updatePresence();
+        })) warning("Discord is not running. Retrying RPC connection.");
     }
 
     private void updatePresence() {
