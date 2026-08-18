@@ -17,6 +17,8 @@ public class YesNoPrompt extends Prompt<YesNoPrompt> {
     };
     private Runnable onNo = () -> {
     };
+    private String yesText = "Yes";
+    private String noText = "No";
 
     private YesNoPrompt(GuiTheme theme, Screen parent) {
         super(theme, parent);
@@ -40,16 +42,26 @@ public class YesNoPrompt extends Prompt<YesNoPrompt> {
         return this;
     }
 
+    public YesNoPrompt yesText(String text) {
+        yesText = text;
+        return this;
+    }
+
+    public YesNoPrompt noText(String text) {
+        noText = text;
+        return this;
+    }
+
     @Override
     protected void initialiseWidgets(PromptScreen screen) {
-        WButton yesButton = screen.list.add(theme.button("Yes")).expandX().widget();
+        WButton yesButton = screen.list.add(theme.button(yesText)).expandX().widget();
         yesButton.action = () -> {
             dontShowAgain(screen);
             onYes.run();
             screen.onClose();
         };
 
-        WButton noButton = screen.list.add(theme.button("No")).expandX().widget();
+        WButton noButton = screen.list.add(theme.button(noText)).expandX().widget();
         noButton.action = () -> {
             dontShowAgain(screen);
             onNo.run();

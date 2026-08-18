@@ -18,3 +18,15 @@ logs
 .idea/*
 !.idea/copyright/*
 !.idea/scopes/*
+
+# Local secrets and deployment credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa
+id_ed25519
+.cloudflared/
+.codex-profile-whileai/
+eyeye-client_SRC.zip

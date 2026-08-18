@@ -126,6 +126,9 @@ public class Modules extends System<Modules> {
     public Module get(String name) {
         for (Module module : moduleInstances.values()) {
             if (module.name.equalsIgnoreCase(name)) return module;
+            for (String alias : module.aliases) {
+                if (alias.equalsIgnoreCase(name)) return module;
+            }
         }
 
         return null;

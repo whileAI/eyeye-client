@@ -30,6 +30,7 @@ import meteordevelopment.meteorclient.utils.misc.Version;
 import meteordevelopment.meteorclient.utils.misc.input.KeyAction;
 import meteordevelopment.meteorclient.utils.misc.input.KeyBinds;
 import meteordevelopment.meteorclient.utils.network.OnlinePlayers;
+import meteordevelopment.meteorclient.utils.network.Updates;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
@@ -139,6 +140,8 @@ public class MeteorClient implements ClientModInitializer {
         // Load configs
         Systems.load();
 
+        Updates.check();
+
         // Post init
         ReflectInit.init(PostInit.class);
 
@@ -182,6 +185,8 @@ public class MeteorClient implements ClientModInitializer {
 
     @EventHandler(priority = EventPriority.LOWEST)
     private void onOpenScreen(OpenScreenEvent event) {
+        if (event.screen instanceof WidgetScreen) mc.execute(Updates::showPrompt);
+
         if (event.screen instanceof WidgetScreen) {
             if (!wasWidgetScreen) wasHudHiddenRoot = mc.gameRenderer.gameRenderState().guiRenderState.isHudHidden;
             if (GuiThemes.get().hideHUD() || wasHudHiddenRoot) {

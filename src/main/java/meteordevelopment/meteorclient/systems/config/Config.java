@@ -194,6 +194,13 @@ public class Config extends System<Config> {
         .build()
     );
 
+    public final Setting<Boolean> updateNotifications = sgMisc.add(new BoolSetting.Builder()
+        .name("update-notifications")
+        .description("Show an EyEye update prompt when a newer client release is available.")
+        .defaultValue(true)
+        .build()
+    );
+
     public List<String> dontShowAgainPrompts = new ArrayList<>();
 
     public Config() {
