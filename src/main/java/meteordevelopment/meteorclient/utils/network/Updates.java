@@ -102,7 +102,7 @@ public final class Updates {
                     throw new IOException("Release checksum mismatch.");
                 }
 
-                startUpdater(mods, pending, release.file, ProcessHandle.current().info().commandLine().orElse(""));
+                startUpdater(mods, pending, release.file, ProcessHandle.current().pid(), ProcessHandle.current().info().commandLine().orElse(""));
                 MeteorClient.mc.execute(MeteorClient.mc::stop);
             } catch (Exception e) {
                 downloading.set(false);
@@ -124,7 +124,7 @@ public final class Updates {
         return hash.toString();
     }
 
-    private static void startUpdater(Path mods, Path pending, String file, String launchCommand) throws IOException {
+    private static void startUpdater(Path mods, Path pending, String file, long processId, String launchCommand) throws IOException {
         Path script = FabricLoader.getInstance().getGameDir().resolve("eyeye-client-update.ps1");
         String encodedMods = Base64.getEncoder().encodeToString(mods.toString().getBytes(StandardCharsets.UTF_8));
         String encodedPending = Base64.getEncoder().encodeToString(pending.toString().getBytes(StandardCharsets.UTF_8));
@@ -134,14 +134,15 @@ public final class Updates {
             $mods = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('%s'))
             $pending = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('%s'))
             $launchCommand = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('%s'))
-            Start-Sleep -Seconds 3
+            while (Get-Process -Id %d -ErrorAction SilentlyContinue) { Start-Sleep -Milliseconds 250 }
+            Start-Sleep -Seconds 1
             Get-ChildItem -LiteralPath $mods -Filter 'eyeye-client-*.jar' -File | Remove-Item -Force
             Move-Item -LiteralPath $pending -Destination (Join-Path $mods '%s') -Force
             Remove-Item -LiteralPath $PSCommandPath -Force
             if (-not [string]::IsNullOrWhiteSpace($launchCommand)) {
                 Start-Process -FilePath 'cmd.exe' -ArgumentList @('/d', '/s', '/c', $launchCommand)
             }
-            """.formatted(encodedMods, encodedPending, encodedLaunchCommand, file);
+            """.formatted(encodedMods, encodedPending, encodedLaunchCommand, processId, file);
 
         Files.writeString(script, scriptText, StandardCharsets.UTF_8);
         new ProcessBuilder("powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script.toString()).start();
